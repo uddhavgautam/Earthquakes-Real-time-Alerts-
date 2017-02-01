@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/titleLocalSettings">
+        <ListPreference
+            android:defaultValue="@string/listPref_DefaultValue_TimeInterval"
+            android:dialogTitle="@string/listPref_DialogTitle_TimeInterval"
+            android:entries="@array/array_TimeInterval"
+            android:entryValues="@array/array_TimeInterval_Values"
+            android:key="@string/listPref_Key_TimeInterval"
+            android:summary="@string/listPref_Summary_TimeInterval"
+            android:title="@string/listPref_Title_TimeInterval" />
+
+        <ListPreference
+            android:defaultValue="@string/listPref_DefaultValue_Magnitude"
+            android:dialogTitle="@string/listPref_DialogTitle_Magnitude"
+            android:entries="@array/array_Magnitude"
+            android:entryValues="@array/array_Magnitude_Values"
+            android:key="@string/listPref_Key_Magnitude"
+            android:summary="@string/listPref_Summary_Magnitude"
+            android:title="@string/listPref_Title_Magnitude" />
+
+        <ListPreference
+            android:defaultValue="@string/listPref_DefaultValue_Sorting"
+            android:dialogTitle="@string/listPref_DialogTitle_Sorting"
+            android:entries="@array/array_Sorting"
+            android:entryValues="@array/array_Sorting_Values"
+            android:key="@string/listPref_Key_Sorting"
+            android:summary="@string/listPref_Summary_Sorting"
+            android:title="@string/listPref_Title_Sorting" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/titleGlobalSettings">
+        <ListPreference
+            android:defaultValue="@string/listPref_DefaultValue_Proximity"
+            android:dialogTitle="@string/listPref_DialogTitle_Proximity"
+            android:entries="@array/array_Proximity"
+            android:entryValues="@array/array_Proximity_Values"
+            android:key="@string/listPref_Key_Proximity"
+            android:summary="@string/listPref_Summary_Proximity"
+            android:title="@string/listPref_Title_Proximity" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/titleNotifications">
+        <CheckBoxPreference
+            android:defaultValue="@string/CheckBoxPref_DefaultValue_Notifications"
+            android:key="@string/CheckBoxPref_Key_Notifications"
+            android:summary="@string/CheckBoxPref_Summary_Notifications"
+            android:title="@string/CheckBoxPref_Title_Notification" />
+
+        <CheckBoxPreference
+            android:defaultValue="@string/CheckBoxPref_DefaultValue_Vibration"
+            android:key="@string/CheckBoxPref_Key_Vibration"
+            android:summary="@string/CheckBoxPref_Summary_Vibration"
+            android:title="@string/CheckBoxPref_Title_Vibration" />
+        <CheckBoxPreference
+            android:defaultValue="@string/CheckBoxPref_DefaultValue_Sound"
+            android:disableDependentsState="true"
+            android:key="@string/CheckBoxPref_Key_Sound"
+            android:persistent="true"
+            android:summaryOff="@string/statu_off"
+            android:summaryOn="@string/statu_on"
+            android:title="@string/CheckBoxPref_Title_Sound" />
+        <CheckBoxPreference
+            android:defaultValue="@string/CheckBoxPref_DefaultValue_Phone"
+            android:disableDependentsState="true"
+            android:key="@string/CheckBoxPref_Key_Phone"
+            android:persistent="true"
+            android:summaryOff="@string/sync_off"
+            android:summaryOn="@string/sync_on"
+            android:title="@string/CheckBoxPref_Title_Phone" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

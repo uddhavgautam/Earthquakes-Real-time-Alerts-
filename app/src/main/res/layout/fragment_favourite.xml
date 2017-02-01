@@ -1,0 +1,17 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/android_white"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context="com.odoo.EmergencyFragment">
+
+    <ListView
+        android:id="@+id/favContactList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="#aaaaaa"
+        android:dividerHeight="0.1dp" />
+
+</LinearLayout>

@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "291113700687",
+    "firebase_url": "https://earthquakesenotifications.firebaseio.com",
+    "project_id": "earthquakesenotifications",
+    "storage_bucket": "earthquakesenotifications.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:291113700687:android:64d56b062a61a39e",
+        "android_client_info": {
+          "package_name": "com.LiveEarthquakesAlerts"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "291113700687-f9e8p5r9j9l8tc0thdpfnpruvsq83jc7.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "291113700687-8b853kidtan6ul2ba3i6qilcce5dub79.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuNX25dzhaPgfgXIjp6A5ZmICkSFvAOY0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-91074699-1"
+          }
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "291113700687-f9e8p5r9j9l8tc0thdpfnpruvsq83jc7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

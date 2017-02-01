@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.odoo.HomeActivity">
+    <!--<item-->
+    <!--android:id="@+id/menu_sync"-->
+    <!--android:icon="@drawable/ic_sync"-->
+    <!--android:paddingRight="0dp"-->
+    <!--android:layout_marginRight="0dp"-->
+    <!--android:title="@string/menu_sync_label"-->
+    <!--app:showAsAction="always" />-->
+
+    <item
+        android:id="@+id/menu_remove_emergency_contact"
+        android:title="@string/remove_fav_contact"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_import_contact"
+        android:title="@string/import_contact_from_device"
+        app:showAsAction="never" />
+</menu>

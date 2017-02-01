@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.LiveEarthquakesAlerts">
+
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <permission
+        android:name="android.permission.BLUETOOTH"
+        android:label="BLUETOOTH" />
+    <permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <permission
+        android:name="android.permission.MAPS_RECEIVE"
+        android:protectionLevel="signature" />
+
+    <!--
+     The following two permissions are not required to use
+     Google Maps Android API v2.
+     These two permissions will be used if you want to trace current location
+    -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
+
+    <application
+        android:name="com.LiveEarthquakesAlerts.controller.utils.App"
+        android:allowBackup="true"
+        android:configChanges="orientation"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/title_activity"
+        android:launchMode="singleTask"
+        android:screenOrientation="portrait"
+        android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/LiveEarthquakesAlerts" />
+
+        <activity
+            android:name="com.LiveEarthquakesAlerts.view.MainActivity"
+            android:label="@string/title_activity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.LiveEarthquakesAlerts.view.MapsActivity" />
+
+        <service
+            android:name="com.LiveEarthquakesAlerts.controller.utils.SyncService"
+            android:exported="false" />
+        <service android:name="com.odoo.auth.OdooAuthenticatorServices">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+
+
+        <activity
+            android:name="com.odoo.HomeActivity"
+            android:label="@string/title_activity_home"
+            android:launchMode="singleTop"
+            android:parentActivityName="com.LiveEarthquakesAlerts.view.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.LiveEarthquakesAlerts.view.MainActivity" />
+        </activity>
+
+        <!-- generally authorities is only package name. if so, name is authorities.classname -->
+        <!-- we can make any string as authority. but name should always be full package name.class -->
+
+        <provider
+            android:name="com.odoo.orm.sync.providers.ContactProvider"
+            android:authorities="com.odoo.contacts.res_partner"
+            android:exported="true"
+            android:multiprocess="true"
+            android:syncable="true" />
+
+        <!-- <provider -->
+        <!-- android:name="com.odoo.orm.sync.providers.ContactProvider" -->
+        <!-- android:authorities="com.odoo.contacts.res_partner" -->
+        <!-- android:exported="false" -->
+        <!-- android:syncable="true" /> -->
+
+        <service
+            android:name="com.odoo.orm.sync.SyncService"
+            android:exported="true"
+            android:process=":sync">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/contact_sync_adapter" />
+        </service>
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <activity android:name="com.odoo.ContactDetailActivity" />
+        <activity android:name="com.odoo.AddContact" />
+        <activity android:name="com.odoo.SearchContactActivity" />
+        <activity
+            android:name="com.LiveEarthquakesAlerts.view.SettingsActivity"
+            android:parentActivityName="com.LiveEarthquakesAlerts.view.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.LiveEarthquakesAlerts.view.MainActivity" />
+        </activity>
+    </application>
+
+</manifest>
