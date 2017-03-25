@@ -2,8 +2,8 @@
 
 <resources>
 
-    <string name="app_name">Earthquakes</string>
-    <string name="title_activity">EarthQuakes Notify</string>
+    <string name="app_name">EarthquakesNotificationTool</string>
+    <string name="title_activity">EarthQuakes Alerts</string>
     <string name="EarthquakesDetect">Earthquake Detected!</string>
     <string name="NoConnection">Internet connection was not found!</string>
     <string name="PleaseWait">Please Wait...</string>

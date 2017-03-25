@@ -29,7 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.LiveEarthquakesAlerts.R;
+import com.liveEarthquakesAlerts.R;
 import com.odoo.orm.ListRow;
 import com.odoo.orm.OListAdapter;
 import com.odoo.table.RecentContact;

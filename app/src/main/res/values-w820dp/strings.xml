@@ -2,8 +2,8 @@
 
 <resources>
 
-    <string name="app_name">Earthquakes</string>
-    <string name="title_activity">EarthQuakes Notify</string>
+    <string name="app_name">EarthquakesNotificationTool</string>
+    <string name="title_activity">EarthQuakes Alerts</string>
     <string name="EarthquakesDetect">Earthquake Detected!</string>
     <string name="NoConnection">Internet connection was not found!</string>
     <string name="PleaseWait">Please Wait...</string>
@@ -24,7 +24,7 @@
     <string name="error_username_required">Username required</string>
     <string name="error_password_required">Password required</string>
 
-    <string name="title_activity_home">Add some Emergency-Contacts</string>
+    <string name="title_activity_home">Add Emergency-Contacts</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="unable_to_connect_odoo">Unable to connect with odoo server</string>

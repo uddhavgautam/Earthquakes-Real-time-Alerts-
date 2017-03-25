@@ -14,7 +14,7 @@ import android.net.Uri;
 import android.text.TextPaint;
 import android.util.Base64;
 
-import com.LiveEarthquakesAlerts.R;
+import com.liveEarthquakesAlerts.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

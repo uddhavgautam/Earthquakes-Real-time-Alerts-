@@ -1,7 +1,7 @@
 package com.odoo.orm;
 
 /**
- * Created by sha on 25/4/16.
+ * Created by uddhav on 25/4/16.
  */
 public class StatementBuilder {
     private OModel mTable;

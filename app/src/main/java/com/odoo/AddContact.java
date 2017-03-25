@@ -16,7 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.LiveEarthquakesAlerts.R;
+import com.liveEarthquakesAlerts.R;
 import com.odoo.table.ResPartner;
 import com.odoo.utils.BitmapUtils;
 

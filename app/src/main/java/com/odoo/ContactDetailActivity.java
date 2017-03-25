@@ -38,7 +38,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.LiveEarthquakesAlerts.R;
+import com.liveEarthquakesAlerts.R;
 import com.odoo.auth.OdooAuthenticator;
 import com.odoo.orm.ListRow;
 import com.odoo.table.ResCountry;

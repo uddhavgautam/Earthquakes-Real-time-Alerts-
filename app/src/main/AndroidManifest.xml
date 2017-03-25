@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.LiveEarthquakesAlerts">
+    package="com.liveEarthquakesAlerts">
 
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -22,6 +22,8 @@
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <!-- Needed only if your app targets Android 5.0 (API level 21) or higher. -->
+    <uses-feature android:name="android.hardware.location.gps" />
 
     <permission
         android:name="android.permission.BLUETOOTH"
@@ -44,7 +46,7 @@
         android:required="true" />
 
     <application
-        android:name="com.LiveEarthquakesAlerts.controller.utils.App"
+        android:name="com.liveEarthquakesAlerts.controller.utils.App"
         android:allowBackup="true"
         android:configChanges="orientation"
         android:icon="@mipmap/ic_launcher"
@@ -60,7 +62,7 @@
             android:value="@string/LiveEarthquakesAlerts" />
 
         <activity
-            android:name="com.LiveEarthquakesAlerts.view.MainActivity"
+            android:name="com.liveEarthquakesAlerts.view.MainActivity"
             android:label="@string/title_activity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -68,11 +70,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.LiveEarthquakesAlerts.view.MapsActivity" />
+        <activity android:name="com.liveEarthquakesAlerts.view.MapsActivity" />
 
         <service
-            android:name="com.LiveEarthquakesAlerts.controller.utils.SyncService"
+            android:name="com.liveEarthquakesAlerts.controller.services.earthquakes.EarthquakesDataSyncService"
             android:exported="false" />
+
         <service android:name="com.odoo.auth.OdooAuthenticatorServices">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
@@ -83,15 +86,14 @@
                 android:resource="@xml/authenticator" />
         </service>
 
-
         <activity
             android:name="com.odoo.HomeActivity"
             android:label="@string/title_activity_home"
             android:launchMode="singleTop"
-            android:parentActivityName="com.LiveEarthquakesAlerts.view.MainActivity">
+            android:parentActivityName="com.liveEarthquakesAlerts.view.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.LiveEarthquakesAlerts.view.MainActivity" />
+                android:value="com.liveEarthquakesAlerts.view.MainActivity" />
         </activity>
 
         <!-- generally authorities is only package name. if so, name is authorities.classname -->
@@ -131,12 +133,16 @@
         <activity android:name="com.odoo.AddContact" />
         <activity android:name="com.odoo.SearchContactActivity" />
         <activity
-            android:name="com.LiveEarthquakesAlerts.view.SettingsActivity"
-            android:parentActivityName="com.LiveEarthquakesAlerts.view.MainActivity">
+            android:name="com.liveEarthquakesAlerts.view.SettingsActivity"
+            android:parentActivityName="com.liveEarthquakesAlerts.view.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.LiveEarthquakesAlerts.view.MainActivity" />
+                android:value="com.liveEarthquakesAlerts.view.MainActivity" />
         </activity>
+
+        <service
+            android:name="com.liveEarthquakesAlerts.controller.services.locations.LocationTracker"
+            android:exported="false"></service>
     </application>
 
 </manifest>

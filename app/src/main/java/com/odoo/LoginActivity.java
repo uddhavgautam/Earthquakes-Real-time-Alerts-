@@ -14,7 +14,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.LiveEarthquakesAlerts.R;
+import com.liveEarthquakesAlerts.R;
 import com.odoo.auth.OdooAuthenticator;
 import com.odoo.orm.sync.ContactSyncAdapter;
 

@@ -30,12 +30,11 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 
-import com.LiveEarthquakesAlerts.R;
+import com.liveEarthquakesAlerts.R;
 
 
-public class BezelImageView extends ImageView {
+public class BezelImageView extends android.support.v7.widget.AppCompatImageView {
     private Paint mBlackPaint;
     private Paint mMaskedPaint;
 

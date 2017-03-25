@@ -19,7 +19,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.LiveEarthquakesAlerts.R;
+import com.liveEarthquakesAlerts.R;
 import com.odoo.orm.ListRow;
 import com.odoo.orm.OListAdapter;
 import com.odoo.table.RecentContact;

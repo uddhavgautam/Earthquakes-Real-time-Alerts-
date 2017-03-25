@@ -30,7 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.LiveEarthquakesAlerts.R;
+import com.liveEarthquakesAlerts.R;
 import com.odoo.auth.OdooAuthenticator;
 import com.odoo.orm.sync.ContactSyncAdapter;
 import com.odoo.table.ResPartner;

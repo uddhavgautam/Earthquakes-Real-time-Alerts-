@@ -5,7 +5,7 @@ import android.database.Cursor;
 import java.util.HashMap;
 
 /**
- * Created by sha on 25/4/16.
+ * Created by uddhav on 25/4/16.
  */
 public class ListRow extends HashMap<String, Object> {
 

@@ -5,12 +5,12 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 
-import com.LiveEarthquakesAlerts.R;
+import com.liveEarthquakesAlerts.R;
 
 import java.util.Locale;
 
 /**
- * Created by sha on 3/5/16.
+ * Created by uddhav on 3/5/16.
  */
 public class OStringColorUtil {
 
