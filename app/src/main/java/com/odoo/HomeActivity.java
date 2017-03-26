@@ -188,18 +188,16 @@ public class HomeActivity extends AppCompatActivity implements TabLayout.OnTabSe
                                     + " = ?", new String[]{contact_id + ""},
                             null);
 
-                    phoneCR.moveToFirst();
-                    String contact_number = phoneCR
-                            .getString(phoneCR
-                                    .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-
-
-                    ContentValues values = new ContentValues();
-                    values.put("name", contact_name);
-                    values.put("image_medium", contact_image);
-                    values.put("mobile", contact_number);
-                    resPartner.update_or_create(values, "name = ? ", contact_name);
-
+                    if(phoneCR != null && phoneCR.moveToFirst()) {
+                        String contact_number = phoneCR
+                                .getString(phoneCR
+                                        .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        ContentValues values = new ContentValues();
+                        values.put("name", contact_name);
+                        values.put("image_medium", contact_image);
+                        values.put("mobile", contact_number);
+                        resPartner.update_or_create(values, "name = ? ", contact_name);
+                    }
 
                 } while (cursor.moveToNext());
                 Log.d("TAG", cursor.getCount() + " contacts import");
@@ -260,8 +258,8 @@ public class HomeActivity extends AppCompatActivity implements TabLayout.OnTabSe
                     return contactFragment;
 
                 case 1:
-                    EmergencyFragment emergencyFragment = new EmergencyFragment();
-                    return emergencyFragment;
+                    FavoriteFragment favoriteFragment = new FavoriteFragment();
+                    return favoriteFragment;
             }
             return PlaceholderFragment.newInstance(position + 1);
         }

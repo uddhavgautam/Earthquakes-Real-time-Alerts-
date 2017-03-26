@@ -15,9 +15,12 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.telephony.SmsManager;
 import android.util.Log;
+import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -36,7 +39,9 @@ import com.liveEarthquakesAlerts.model.database.EarthQuakes;
 import com.liveEarthquakesAlerts.model.database.LastEarthquakeDate;
 import com.liveEarthquakesAlerts.model.database.RiskyEarthquakes;
 import com.liveEarthquakesAlerts.view.MainActivity;
+import com.odoo.FavoriteNumberBean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /* The IntentService class provides a straightforward structure for running an operation on a single background thread. */
@@ -60,6 +65,7 @@ public class LocationTracker extends Service
     private Location location; // location
     private LocationSettingsRequest mLocationSettingsRequest;
     private LocationPOJO locationPOJO;
+    private String messageEarthquake;
 
     public LocationTracker() {
     }
@@ -195,7 +201,10 @@ public class LocationTracker extends Service
 
             if (AppSettings.getInstance().isNotifications()) {
                     createNotification(getString(R.string.EarthquakesDetect), "" + newEarthquakes.get(0).getMagnitude() + "  |  " + newEarthquakes.get(0).getLocationName());
+                    messageEarthquake = "Earthquake Hit !!" + newEarthquakes.get(0).getMagnitude() + "  |  " + newEarthquakes.get(0).getLocationName();
+
             }
+
 
             LastEarthquakeDate led = new LastEarthquakeDate();
             led.setDateMilis(new EarthQuakes().GetLastEarthQuakeDate());
@@ -204,8 +213,33 @@ public class LocationTracker extends Service
     }
 
     private void sendMsgToEmergencyContacts() {
+        FavoriteNumberBean favoriteNumberBean = new FavoriteNumberBean(false);
+        ArrayList<String> mobileList = favoriteNumberBean.getMobileNumber();
+        SmsManager smsManager = SmsManager.getDefault();
+        //send every emergency contacts the messages
+        for (String phone: mobileList) {
+            smsManager.sendTextMessage(phone, null, messageEarthquake, null, null);
+        }
+        //now create "I am Ok button", tap it to send "I am Ok" messages to every emergency contacts
 
-
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                //create a floating button
+                FloatingActionButton floatingActionButton = new FloatingActionButton(getApplicationContext());
+                floatingActionButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        FavoriteNumberBean favoriteNumberBean = new FavoriteNumberBean(false);
+                        ArrayList<String> mobileList = favoriteNumberBean.getMobileNumber();
+                        SmsManager smsManager = SmsManager.getDefault();
+                        //send every emergency contacts the messages
+                        for (String phone: mobileList) {
+                            smsManager.sendTextMessage(phone, null, "I am Ok!", null, null);
+                        }                    }
+                });
+            }
+        });
     }
 
     private void createNotification(String strContentTitle, String strContentText) {

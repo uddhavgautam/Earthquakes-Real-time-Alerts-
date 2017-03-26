@@ -5,7 +5,7 @@
     android:background="@color/android_white"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context="com.odoo.EmergencyFragment">
+    tools:context="com.odoo.FavoriteFragment">
 
     <ListView
         android:id="@+id/favContactList"

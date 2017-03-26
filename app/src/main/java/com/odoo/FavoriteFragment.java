@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +31,7 @@ import com.odoo.utils.BitmapUtils;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class EmergencyFragment extends Fragment implements OListAdapter.OnViewBindListener,
+public class FavoriteFragment extends Fragment implements OListAdapter.OnViewBindListener,
         LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener {
 
     private ResPartner resPartner;
@@ -38,7 +39,7 @@ public class EmergencyFragment extends Fragment implements OListAdapter.OnViewBi
     private ListView favContactList;
     private RecentContact recentContact;
 
-    public EmergencyFragment() {
+    public FavoriteFragment() {
     }
 
     @Override
@@ -79,6 +80,10 @@ public class EmergencyFragment extends Fragment implements OListAdapter.OnViewBi
         stringEmail = row.getString("email");
         stringCity = row.getString("city");
         stringMobile = row.getString("mobile");
+        Log.i("Mobile", stringMobile);
+        //write mobile number to bean and get it from there
+        FavoriteNumberBean favoriteNumberBean = new FavoriteNumberBean(); //clears the list first
+        favoriteNumberBean.addToArrayList(stringMobile);
         stringImage = row.getString("image_medium");
         stringCompanyType = row.getString("company_type");
 
@@ -92,8 +97,6 @@ public class EmergencyFragment extends Fragment implements OListAdapter.OnViewBi
         textContactNumber.setText(stringMobile);
         textContactNumber.setVisibility(stringMobile.equals("false") ? View.GONE : View.VISIBLE);
 
-//        isCompany.setVisibility(stringCompanyType.equals("person") ? View.GONE : View.VISIBLE);
-
         if (stringImage.equals("false")) {
             profileImage.setImageBitmap(BitmapUtils.getAlphabetImage(getContext(), stringName));
         } else {
@@ -103,7 +106,7 @@ public class EmergencyFragment extends Fragment implements OListAdapter.OnViewBi
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) { //loader are threads, therefore, we see various callbacks
         Uri uri = Uri.parse("content://com.odoo.contacts.res_partner/res_partner");
         return new CursorLoader(getContext(), uri, null, "isFavourite = ? ", new String[]{"true"}, null);
     }
