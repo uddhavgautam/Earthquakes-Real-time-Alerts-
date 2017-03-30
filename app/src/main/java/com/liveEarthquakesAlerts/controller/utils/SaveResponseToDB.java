@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -18,6 +19,7 @@ import com.liveEarthquakesAlerts.model.sources.pOJOFolderUSGS.insidePOJOFolderUS
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,9 +60,16 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
                     for (DataSnapshot feature : dataSnapshot.child("features").getChildren()) {
 
                         //get all required data
+
+                        time = Long.parseLong(feature.child("properties").child("time").getValue().toString());
+                        if(new Date().getTime() - time > 11000) { //old data
+                            //upload the JSON again
+                            updateFirebase(CreateRequestUrl.URL_USGS(0), FirebaseDatabase.getInstance().getReference().getRoot());
+                            return;
+                        }
+
                         str1 = feature.child("properties").child("place").getValue().toString().trim().toUpperCase();
                         locationName = str1.substring(str1.indexOf("of") + 3);
-                        time = Long.parseLong(feature.child("properties").child("time").getValue().toString());
                         sig = Integer.parseInt(feature.child("properties").child("sig").getValue().toString());
                         magnitude = Float.parseFloat(feature.child("properties").child("mag").getValue().toString());
                         longitude = Float.parseFloat(feature.child("geometry").child("coordinates").child("0").getValue().toString());
@@ -101,7 +110,7 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
 
     }
 
-    public void initializeFirebase(final String url, final DatabaseReference databaseReference) { //save every earthquake fields like magnitude, latitude etc.
+    public void updateFirebase(final String url, final DatabaseReference databaseReference) { //save every earthquake fields like magnitude, latitude etc.
 
         try {
 

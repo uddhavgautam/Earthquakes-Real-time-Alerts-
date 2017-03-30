@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     //create Firebase Realtime DB jsonOriginal structure and upload earthquake JSON
 
                     SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
-                    clientHelper.initializeFirebase(CreateRequestUrl.URL_USGS(0), databaseReference);
+                    clientHelper.updateFirebase(CreateRequestUrl.URL_USGS(0), databaseReference);
 
 //                    unregister valueEventListener
                     databaseReference.removeEventListener(this);
