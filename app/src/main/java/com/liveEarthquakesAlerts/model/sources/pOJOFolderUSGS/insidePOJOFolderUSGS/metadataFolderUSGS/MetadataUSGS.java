@@ -1,16 +1,16 @@
-package com.liveEarthquakesAlerts.model.sources.usgsFolder.insideUsgs.metadataFolder;
+package com.liveEarthquakesAlerts.model.sources.pOJOFolderUSGS.insidePOJOFolderUSGS.metadataFolderUSGS;
 
 /**
- * Created by uddhav Gautam on 7.3.2016. upgautam@ualr.edu
+ * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
-public class metadata1 {
+public class MetadataUSGS {
 
     private long generated;
     private String url;
     private String title;
     private int status;
     private String api;
-    private int totalCount;
+    private int count;
 
     public long getGenerated() {
         return generated;
@@ -28,12 +28,12 @@ public class metadata1 {
         this.url = url;
     }
 
-    public String getSubTitle() { //shows title of Earthquake in ListView
+    public String getTitle() {
         return title;
     }
 
-    public void setSubTitle(String subTitle) {
-        this.title = subTitle;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public int getStatus() {
@@ -52,11 +52,11 @@ public class metadata1 {
         this.api = api;
     }
 
-    public int getTotalCount() {
-        return totalCount;
+    public int getCount() {
+        return count;
     }
 
-    public void setTotalCount(int totalCount) {
-        this.totalCount = totalCount;
+    public void setCount(int count) {
+        this.count = count;
     }
 }

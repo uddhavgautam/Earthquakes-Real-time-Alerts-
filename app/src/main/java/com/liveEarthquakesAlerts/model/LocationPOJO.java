@@ -3,7 +3,7 @@ package com.liveEarthquakesAlerts.model;
 import android.location.Location;
 
 /**
- * Created by uddhav on 3/22/17.
+ * Created by  Uddhav Gautam  on 3/22/17.
  */
 
 public class LocationPOJO {

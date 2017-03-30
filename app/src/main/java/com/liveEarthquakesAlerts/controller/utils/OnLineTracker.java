@@ -7,7 +7,7 @@ import android.net.NetworkInfo;
 //import com.splunk.mint.Mint;
 
 /**
- * Created by uddhav Gautam on 7.3.2016. upgautam@ualr.edu
+ * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
 public class OnLineTracker {
 

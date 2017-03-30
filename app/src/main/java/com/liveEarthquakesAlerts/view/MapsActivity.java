@@ -30,7 +30,7 @@ import com.liveEarthquakesAlerts.model.database.EarthQuakes;
 import java.util.ArrayList;
 
 /**
- * Created by uddhav Gautam on 7.3.2016. upgautam@ualr.edu
+ * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMarkerDragListener {
 

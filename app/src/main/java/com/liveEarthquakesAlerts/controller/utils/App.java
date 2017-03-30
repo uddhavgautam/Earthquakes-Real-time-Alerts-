@@ -4,7 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 /**
- * Created by uddhav Gautam on 7.3.2016. upgautam@ualr.edu
+ * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
 public class App extends Application { //App class for: 1) providing application context 2)Starting Otto Bus
 

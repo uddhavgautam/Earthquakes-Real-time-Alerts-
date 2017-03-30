@@ -1,11 +1,9 @@
 package com.odoo;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
- * Created by uddhav on 3/26/17.
+ * Created by  Uddhav Gautam  on 3/26/17.
  */
 
 public class FavoriteNumberBean {
@@ -16,16 +14,16 @@ public class FavoriteNumberBean {
         this.isToClear = isToClear;
     }
 
+    public FavoriteNumberBean() {
+        mobileNumber.clear();
+    }
+
     public ArrayList<String> getMobileNumber() {
         return mobileNumber;
     }
 
     public void setMobileNumber(ArrayList<String> mobileNumber) {
         this.mobileNumber = mobileNumber;
-    }
-
-    public FavoriteNumberBean() {
-        mobileNumber.clear();
     }
 
     public void addToArrayList(String stringMobile) {

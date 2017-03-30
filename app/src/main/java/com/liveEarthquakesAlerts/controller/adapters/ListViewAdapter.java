@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by uddhav Gautam on 7.3.2016. upgautam@ualr.edu
+ * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
 public class ListViewAdapter extends ArrayAdapter<EarthQuakes> { // just to GUI present for earthquake records in ListView
 

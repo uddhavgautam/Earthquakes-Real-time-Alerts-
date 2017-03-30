@@ -1,16 +1,16 @@
-package com.liveEarthquakesAlerts.model.sources.usgsFolder.insideUsgs.featuresFolder;
+package com.liveEarthquakesAlerts.model.sources.pOJOFolderUSGS.insidePOJOFolderUSGS.featuresFolderUSGS;
 
 /**
- * Created by uddhav Gautam on 7.3.2016. upgautam@ualr.edu
+ * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
-public class features1<P, G> { //generic representation. Two different generic types.
-// These types can be any type, properties, geometry, id are 4 attributes of feature.
+public class FeaturesUSGS<P, G> { //generic representation. Two different generic types.
+// These types can be any type, PropertiesUSGS, GeometryUSGS, id are 4 attributes of feature.
     // Each feature means each earthquake.
     // Generic is only for object, not for primitive types
 
     private String type;
-    private P properties; //added properties as first generic type
-    private G geometry; //added geometry as second generic type
+    private P properties; //added PropertiesUSGS as first generic type
+    private G geometry; //added GeometryUSGS as second generic type
     private String id;
 
     public String getType() {

@@ -12,6 +12,7 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.DatabaseTable;
 import com.liveEarthquakesAlerts.controller.utils.AppSettings;
 import com.liveEarthquakesAlerts.controller.utils.OnLineTracker;
+import com.liveEarthquakesAlerts.model.LocationPOJO;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Created by uddhav Gautam on 7.3.2016. upgautam@ualr.edu
+ * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
 @DatabaseTable(tableName = "EarthQuakes")
 public class EarthQuakes implements Parcelable, Comparator<EarthQuakes> {
@@ -135,6 +136,53 @@ public class EarthQuakes implements Parcelable, Comparator<EarthQuakes> {
                     .gt("Magnitude", AppSettings.getInstance().getMagnitude()) //
                     .and()//
                     .gt("DateMilis", backdate);
+
+
+            if (sortingType == 0) {
+                qBuilder.orderBy("DateMilis", true);
+            } else if (sortingType == 1) {
+                qBuilder.orderBy("DateMilis", false);
+            } else if (sortingType == 2) {
+                qBuilder.orderBy("Magnitude", true);
+            } else if (sortingType == 3) {
+                qBuilder.orderBy("Magnitude", false);
+            }
+
+            PreparedQuery<EarthQuakes> pQuery = qBuilder.prepare();
+            data = dao.query(pQuery);
+
+        } catch (SQLException e) {
+            OnLineTracker.catchException(e);
+        }
+
+//        Log.i("Row1", data.get(0).getLocationName());
+        return data;
+    }
+
+    public List<EarthQuakes> GetAllDataUserProximity() {
+
+        List<EarthQuakes> data = new ArrayList<>();
+
+        try {
+
+            Dao<EarthQuakes, Long> dao = DatabaseHelper.getDbHelper().getEarthQuakesDataHelper();
+            QueryBuilder<EarthQuakes, Long> qBuilder = dao.queryBuilder();
+
+            int sortingType = AppSettings.getInstance().getSorting();
+            Long backdate = backDate();
+
+            qBuilder.where()//
+                    .gt("Magnitude", AppSettings.getInstance().getMagnitude()) //
+                    .and()//
+                    .gt("DateMilis", backdate)
+                    .and()//
+                    .gt("Latitude", LocationPOJO.location.getLatitude() - 2.91)
+                    .and()//
+                    .gt("Longitude", LocationPOJO.location.getLongitude() - 2.89)
+                    .and()//
+                    .lt("Latitude", LocationPOJO.location.getLatitude() + 2.91)
+                    .and()//
+                    .lt("Longitude", LocationPOJO.location.getLongitude() + 2.89);
 
 
             if (sortingType == 0) {

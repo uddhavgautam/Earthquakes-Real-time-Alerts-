@@ -19,7 +19,7 @@ import com.liveEarthquakesAlerts.controller.utils.AppSettings;
 
 
 /**
- * Created by uddhav on 1/5/17.
+ * Created by  Uddhav Gautam  on 1/5/17.
  */
 public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
     private String Key_TimeInterval, Key_Magnitude, Key_Proximity;

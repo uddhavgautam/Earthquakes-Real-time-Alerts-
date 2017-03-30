@@ -16,6 +16,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.liveEarthquakesAlerts.R;
 import com.liveEarthquakesAlerts.controller.adapters.ListViewAdapter;
 import com.liveEarthquakesAlerts.controller.services.earthquakes.EarthquakesDataSyncService;
@@ -25,7 +30,9 @@ import com.liveEarthquakesAlerts.controller.utils.App;
 import com.liveEarthquakesAlerts.controller.utils.AppSettings;
 import com.liveEarthquakesAlerts.controller.utils.BusStatus;
 import com.liveEarthquakesAlerts.controller.utils.CheckRiskEarthquakes;
+import com.liveEarthquakesAlerts.controller.utils.CreateRequestUrl;
 import com.liveEarthquakesAlerts.controller.utils.OnLineTracker;
+import com.liveEarthquakesAlerts.controller.utils.SaveResponseToDB;
 import com.liveEarthquakesAlerts.model.LocationPOJO;
 import com.liveEarthquakesAlerts.model.database.EarthQuakes;
 import com.liveEarthquakesAlerts.model.database.LastEarthquakeDate;
@@ -35,11 +42,12 @@ import com.squareup.otto.Subscribe;
 import java.util.List;
 
 /**
- * Created by uddhav Gautam on 7.3.2016. upgautam@ualr.edu
+ * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener, OnScrollListener {
 
     public static String bannerText;
+    private final String TAG = "MainActivity";
     private ProgressDialog pd;
     private ListView list;
     private int currentScrollState, currentFirstVisibleItem, currentVisibleItemCount, currentTotalItemCount;
@@ -47,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private TextView tvEmptyMessage;
     private TextView tvBanner;
     private boolean isConnectToInternet = true;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -101,25 +108,53 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 //        start service to track user location
         if (!LocationTracker.isServiceRunning) { //if service not running
-            final Intent intent = new Intent(getApplicationContext(), LocationTracker.class); //start service
+            Intent intent = new Intent(getApplicationContext(), LocationTracker.class); //start service
             startService(intent);
         }
 
+        initializeFirebaseRealtimeDB();
 
-        //start service to fetch earthquakes
-        if (!EarthquakesDataSyncService.isServiceRunning) { //if service not running
-            Log.i("MainActivity", "Service Started");
-            final Intent intent = new Intent(getBaseContext(), EarthquakesDataSyncService.class); //start service
-            startService(intent);
 
-            pd = new ProgressDialog(MainActivity.this); //show progressbar
-            pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            pd.setTitle(getString(R.string.PleaseWait));
-            pd.setMessage(getString(R.string.DatasLoading));
-            pd.setCancelable(true);
-            pd.setIndeterminate(true);
-            pd.show();
-        }
+//        start service to fetch earthquakes
+
+        Intent intent = new Intent(getBaseContext(), EarthquakesDataSyncService.class); //start service
+        startService(intent);
+
+        pd = new ProgressDialog(MainActivity.this); //show progressbar
+        pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        pd.setTitle(getString(R.string.PleaseWait));
+        pd.setMessage(getString(R.string.DatasLoading));
+        pd.setCancelable(true);
+        pd.setIndeterminate(true);
+        pd.show();
+
+    }
+
+    private void initializeFirebaseRealtimeDB() {
+        final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot();
+        Log.i("reference1", databaseReference.toString());
+
+        final ValueEventListener valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.getChildren().iterator().hasNext()) {//empty
+
+                    //create Firebase Realtime DB jsonOriginal structure and upload earthquake JSON
+
+                    SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
+                    clientHelper.initializeFirebase(CreateRequestUrl.URL_USGS(0), databaseReference);
+
+//                    unregister valueEventListener
+                    databaseReference.removeEventListener(this);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        databaseReference.addValueEventListener(valueEventListener);
     }
 
     @Override
@@ -161,9 +196,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             list.setAdapter(null);
         } else {
             isConnectToInternet = true;
+            List<EarthQuakes> EarthQuakeList;
             Log.i("ConnectInternet", "true");
-            List<EarthQuakes> EarthQuakeList = new EarthQuakes().GetAllData();
-
+            if (AppSettings.getInstance().getProximityMiles() == 0) {
+                EarthQuakeList = new EarthQuakes().GetAllDataUserProximity();
+            } else {
+                EarthQuakeList = new EarthQuakes().GetAllData();
+            }
             if (EarthQuakeList.size() > 0) {
                 Log.i("EarthquakeData", "Yes");
                 adapter = new ListViewAdapter(MainActivity.this, EarthQuakeList);

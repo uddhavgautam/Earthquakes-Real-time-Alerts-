@@ -12,7 +12,7 @@ import com.liveEarthquakesAlerts.model.database.EarthQuakes;
 import java.util.Date;
 
 /**
- * Created by uddhav Gautam on 7.3.2016. upgautam@ualr.edu
+ * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
 public class MarkerInfoAdapter implements InfoWindowAdapter { // this is to mark location via google maps when user clicks earthquake records
 

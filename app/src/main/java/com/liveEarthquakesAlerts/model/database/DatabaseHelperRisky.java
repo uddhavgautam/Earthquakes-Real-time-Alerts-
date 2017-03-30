@@ -13,7 +13,7 @@ import com.liveEarthquakesAlerts.controller.utils.OnLineTracker;
 import java.sql.SQLException;
 
 /**
- * Created by uddhav on 3/23/17.
+ * Created by  Uddhav Gautam  on 3/23/17.
  */
 
 public class DatabaseHelperRisky extends OrmLiteSqliteOpenHelper {

@@ -12,7 +12,7 @@ import android.os.Bundle;
 import com.odoo.LoginActivity;
 
 /**
- * Created by uddhav on 19/4/16.
+ * Created by  Uddhav Gautam  on 19/4/16.
  */
 public class OdooAuthenticator extends AbstractAccountAuthenticator {
 

@@ -10,7 +10,7 @@ import com.liveEarthquakesAlerts.R;
 import java.util.Locale;
 
 /**
- * Created by uddhav on 3/5/16.
+ * Created by  Uddhav Gautam  on 3/5/16.
  */
 public class OStringColorUtil {
 

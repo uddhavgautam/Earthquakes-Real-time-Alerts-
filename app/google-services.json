@@ -13,19 +13,10 @@
           "package_name": "com.LiveEarthquakesAlerts"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "291113700687-f9e8p5r9j9l8tc0thdpfnpruvsq83jc7.apps.googleusercontent.com",
-          "client_type": 3
-        },
-        {
-          "client_id": "291113700687-8b853kidtan6ul2ba3i6qilcce5dub79.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBuNX25dzhaPgfgXIjp6A5ZmICkSFvAOY0"
+          "current_key": "AIzaSyAVSs7sUsXJzIwO-CESYYnwBJ9Z_DaZGe4"
         }
       ],
       "services": {
@@ -36,13 +27,8 @@
           }
         },
         "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "291113700687-f9e8p5r9j9l8tc0thdpfnpruvsq83jc7.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "status": 1,
+          "other_platform_oauth_client": []
         },
         "ads_service": {
           "status": 2

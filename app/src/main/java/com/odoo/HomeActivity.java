@@ -188,7 +188,7 @@ public class HomeActivity extends AppCompatActivity implements TabLayout.OnTabSe
                                     + " = ?", new String[]{contact_id + ""},
                             null);
 
-                    if(phoneCR != null && phoneCR.moveToFirst()) {
+                    if (phoneCR != null && phoneCR.moveToFirst()) {
                         String contact_number = phoneCR
                                 .getString(phoneCR
                                         .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));

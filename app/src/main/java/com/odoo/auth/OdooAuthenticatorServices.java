@@ -6,7 +6,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 /**
- * Created by uddhav on 19/4/16.
+ * Created by  Uddhav Gautam  on 19/4/16.
  */
 public class OdooAuthenticatorServices extends Service {
 

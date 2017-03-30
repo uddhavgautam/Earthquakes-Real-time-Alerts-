@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Created by uddhav on 25/4/16.
+ * Created by  Uddhav Gautam  on 25/4/16.
  */
 public abstract class OModel extends SQLiteOpenHelper implements BaseColumns {
     public static final String DB_NAME = "OdooContacts.db";

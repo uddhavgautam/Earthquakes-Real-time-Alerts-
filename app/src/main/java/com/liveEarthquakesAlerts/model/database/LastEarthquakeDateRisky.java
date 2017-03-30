@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.util.Comparator;
 
 /**
- * Created by uddhav Gautam on 7.3.2016. upgautam@ualr.edu
+ * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
 
 @DatabaseTable(tableName = "LastEarthquakeDateRisky")

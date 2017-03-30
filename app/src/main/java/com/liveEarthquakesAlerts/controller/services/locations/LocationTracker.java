@@ -24,14 +24,11 @@ import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
 import com.liveEarthquakesAlerts.R;
-import com.liveEarthquakesAlerts.controller.services.earthquakes.EarthquakesDataSyncService;
 import com.liveEarthquakesAlerts.controller.utils.AppSettings;
 import com.liveEarthquakesAlerts.controller.utils.CheckRiskEarthquakes;
 import com.liveEarthquakesAlerts.model.LocationPOJO;
@@ -51,12 +48,10 @@ public class LocationTracker extends Service
         GoogleApiClient.OnConnectionFailedListener {
 
 
-    private Handler handler;
-
-
-    private List<RiskyEarthquakes> riskyEarthquakes;
     private static final String TAG = "LocationTracker";
     public static boolean isServiceRunning = false;
+    private Handler handler;
+    private List<RiskyEarthquakes> riskyEarthquakes;
     private int count = 0;
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
@@ -113,6 +108,7 @@ public class LocationTracker extends Service
 
     }
 
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) { //this calls onStart()
 
@@ -122,6 +118,7 @@ public class LocationTracker extends Service
     @Override
     public void onDestroy() {
         Log.i(TAG, "Service destroyed!");
+        isServiceRunning = false;
         mGoogleApiClient.disconnect();
         super.onDestroy();
     }
@@ -168,14 +165,14 @@ public class LocationTracker extends Service
         List<RiskyEarthquakes> allRiskyEarthquakes = riskyEarthquakes.GetAllData();
 
         //update the RiskyEarthquakes
-        for (RiskyEarthquakes r: allRiskyEarthquakes) {
-            if(!CheckRiskEarthquakes.checkRisky(r)) {
+        for (RiskyEarthquakes r : allRiskyEarthquakes) {
+            if (!CheckRiskEarthquakes.checkRisky(r)) {
                 r.DeleteRow(r.getDateMilis());
             }
         }
 
-        for (RiskyEarthquakes r:allRiskyEarthquakes) {
-            while(CheckRiskEarthquakes.checkRisky(r)) {
+        for (RiskyEarthquakes r : allRiskyEarthquakes) {
+            while (CheckRiskEarthquakes.checkRisky(r)) {
                 //Notify user
                 notificationHandler();
                 //Notify emergency only one time, then pop the "I am Ok" button to click and push messages "I am ok"
@@ -200,8 +197,8 @@ public class LocationTracker extends Service
         if (newEarthquakes.size() > 0) { //if there are earthquakes
 
             if (AppSettings.getInstance().isNotifications()) {
-                    createNotification(getString(R.string.EarthquakesDetect), "" + newEarthquakes.get(0).getMagnitude() + "  |  " + newEarthquakes.get(0).getLocationName());
-                    messageEarthquake = "Earthquake Hit !!" + newEarthquakes.get(0).getMagnitude() + "  |  " + newEarthquakes.get(0).getLocationName();
+                createNotification(getString(R.string.EarthquakesDetect), "" + newEarthquakes.get(0).getMagnitude() + "  |  " + newEarthquakes.get(0).getLocationName());
+                messageEarthquake = "Earthquake Hit !!" + newEarthquakes.get(0).getMagnitude() + "  |  " + newEarthquakes.get(0).getLocationName();
 
             }
 
@@ -217,7 +214,7 @@ public class LocationTracker extends Service
         ArrayList<String> mobileList = favoriteNumberBean.getMobileNumber();
         SmsManager smsManager = SmsManager.getDefault();
         //send every emergency contacts the messages
-        for (String phone: mobileList) {
+        for (String phone : mobileList) {
             smsManager.sendTextMessage(phone, null, messageEarthquake, null, null);
         }
         //now create "I am Ok button", tap it to send "I am Ok" messages to every emergency contacts
@@ -234,9 +231,10 @@ public class LocationTracker extends Service
                         ArrayList<String> mobileList = favoriteNumberBean.getMobileNumber();
                         SmsManager smsManager = SmsManager.getDefault();
                         //send every emergency contacts the messages
-                        for (String phone: mobileList) {
+                        for (String phone : mobileList) {
                             smsManager.sendTextMessage(phone, null, "I am Ok!", null, null);
-                        }                    }
+                        }
+                    }
                 });
             }
         });

@@ -10,7 +10,7 @@ import com.liveEarthquakesAlerts.R;
 import java.util.Map;
 
 /**
- * Created by uddhav Gautam on 7.3.2016. upgautam@ualr.edu
+ * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
 public class AppSettings {
 

@@ -1,17 +1,17 @@
-package com.liveEarthquakesAlerts.model.sources.usgsFolder.insideUsgs.featuresFolder.insideFeatures;
+package com.liveEarthquakesAlerts.model.sources.pOJOFolderUSGS.insidePOJOFolderUSGS.featuresFolderUSGS.insideFeaturesUSGS;
 
 /**
- * Created by uddhav Gautam on 7.3.2016. upgautam@ualr.edu
+ * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
 
 import java.util.List;
 
-public class geometry1 {
+public class GeometryUSGS {
 
     private String type;
     private List<Float> coordinates;
 
-    public String getType() { //return type of Geometry. eg, point, line, Polygon etc. Here it is always point
+    public String getType() { //return type of GeometryUSGS. eg, point, line, Polygon etc. Here it is always point
         return type;
     }
 

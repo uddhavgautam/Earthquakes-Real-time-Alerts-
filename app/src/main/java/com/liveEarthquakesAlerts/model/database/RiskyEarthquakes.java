@@ -20,7 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Created by uddhav Gautam on 7.3.2016. upgautam@ualr.edu
+ * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
 @DatabaseTable(tableName = "RiskyEarthquakes")
 public class RiskyEarthquakes implements Parcelable, Comparator<RiskyEarthquakes> {

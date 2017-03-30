@@ -2,20 +2,24 @@ package com.liveEarthquakesAlerts.controller.utils;
 
 import android.util.Log;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.liveEarthquakesAlerts.model.database.DatabaseHelper;
 import com.liveEarthquakesAlerts.model.database.EarthQuakes;
 import com.liveEarthquakesAlerts.model.database.RiskyEarthquakes;
-import com.liveEarthquakesAlerts.model.sources.usgsFolder.insideUsgs.featuresFolder.features1;
-import com.liveEarthquakesAlerts.model.sources.usgsFolder.insideUsgs.featuresFolder.insideFeatures.geometry1;
-import com.liveEarthquakesAlerts.model.sources.usgsFolder.insideUsgs.featuresFolder.insideFeatures.properties1;
-import com.liveEarthquakesAlerts.model.sources.usgsFolder.insideUsgs.metadataFolder.metadata1;
-import com.liveEarthquakesAlerts.model.sources.usgsFolder.usgs;
+import com.liveEarthquakesAlerts.model.sources.pOJOFolderUSGS.POJOUSGS;
+import com.liveEarthquakesAlerts.model.sources.pOJOFolderUSGS.insidePOJOFolderUSGS.featuresFolderUSGS.FeaturesUSGS;
+import com.liveEarthquakesAlerts.model.sources.pOJOFolderUSGS.insidePOJOFolderUSGS.featuresFolderUSGS.insideFeaturesUSGS.GeometryUSGS;
+import com.liveEarthquakesAlerts.model.sources.pOJOFolderUSGS.insidePOJOFolderUSGS.featuresFolderUSGS.insideFeaturesUSGS.PropertiesUSGS;
+import com.liveEarthquakesAlerts.model.sources.pOJOFolderUSGS.insidePOJOFolderUSGS.metadataFolderUSGS.MetadataUSGS;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -24,85 +28,139 @@ import okhttp3.Response;
 //We need database helper, so that, before we do insert new records, we clear database first
 
 /**
- * Created by uddhav Gautam on 7.3.2016. upgautam@ualr.edu
+ * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
 public class SaveResponseToDB { //this class updates EarthQuakes Bean
 
-    private int decimalPlace = 1;
+
+    private String locationName, jsonOriginal = null, str1;
+    private Integer sig, decimalPlace = 1;
+    private Long time;
+    private Float longitude, latitude, depth, magnitude;
 
     public SaveResponseToDB() {
         DatabaseHelper.getDbHelper().clearDatabase();
     }
 
-    public void saveDatabaseUsgs(String url) { //save every earthquake fields like magnitude, latitude etc.
+    public static String getJson(String reqUrl) throws Exception {
+        Request request = new Request.Builder().url(reqUrl).build(); //Request builder is used to get JSON url
+        Response response = new OkHttpClient().newCall(request).execute(); //OkHttpClient is HTTP client to request
+        return response.isSuccessful() ? response.body().string() : "";
+    }
+
+    public void getDataFromFirebase(final DataSnapshot dataSnapshot) { //save every earthquake fields like magnitude, latitude etc.
+
+        new Thread(new Runnable() { //should do network operation using separate thread; can't do from main thread
+            @Override
+            public void run() {
+                try {
+
+                    for (DataSnapshot feature : dataSnapshot.child("features").getChildren()) {
+
+                        //get all required data
+                        str1 = feature.child("properties").child("place").getValue().toString().trim().toUpperCase();
+                        locationName = str1.substring(str1.indexOf("of") + 3);
+                        time = Long.parseLong(feature.child("properties").child("time").getValue().toString());
+                        sig = Integer.parseInt(feature.child("properties").child("sig").getValue().toString());
+                        magnitude = Float.parseFloat(feature.child("properties").child("mag").getValue().toString());
+                        longitude = Float.parseFloat(feature.child("geometry").child("coordinates").child("0").getValue().toString());
+                        latitude = Float.parseFloat(feature.child("geometry").child("coordinates").child("1").getValue().toString());
+                        depth = Float.parseFloat(feature.child("geometry").child("coordinates").child("2").getValue().toString());
+
+
+                        //update Earthquake object
+                        EarthQuakes eq = new EarthQuakes(); //EarthQuakes is a bean
+                        eq.setSig(sig);
+                        eq.setDateMilis(time);
+                        eq.setDepth(round(depth, decimalPlace)); //depth means altitude. In this way, database is getting updated
+                        eq.setLatitude(latitude);
+                        eq.setLongitude(longitude);
+                        eq.setLocationName(locationName);
+                        eq.setMagnitude(round(magnitude, decimalPlace));
+
+                        eq.Insert();
+
+                        if (CheckRiskEarthquakes.checkRisky(latitude, longitude, sig)) {
+                            RiskyEarthquakes riskyEarthquakes = new RiskyEarthquakes();
+                            riskyEarthquakes.setSig(sig);
+                            riskyEarthquakes.setDateMilis(time);
+                            riskyEarthquakes.setDepth(round(depth, decimalPlace)); //depth means altitude. In this way, database is getting updated
+                            riskyEarthquakes.setLatitude(latitude);
+                            riskyEarthquakes.setLongitude(longitude);
+                            riskyEarthquakes.setLocationName(locationName);
+                            riskyEarthquakes.setMagnitude(round(magnitude, decimalPlace));
+                            riskyEarthquakes.Insert();
+                        }
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+    }
+
+    public void initializeFirebase(final String url, final DatabaseReference databaseReference) { //save every earthquake fields like magnitude, latitude etc.
 
         try {
 
-            Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat(OnLineTracker.DATEFORMAT).create();
-            Type listType = new TypeToken<usgs<String, metadata1, features1<properties1, geometry1>, Float>>() {
+            final Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat(OnLineTracker.DATEFORMAT).create();
+            final Type listType = new TypeToken<POJOUSGS<String, MetadataUSGS, FeaturesUSGS<PropertiesUSGS, GeometryUSGS>, Float>>() {
             }.getType();
 
 
-            String json = getJson(url);
+            new Thread(new Runnable() { //should do network operation using separate thread; can't do from main thread
+                @Override
+                public void run() {
+                    try {
+                        jsonOriginal = getJson(url);
 
-            if (json == null || json.length() < 10) { // JSON is null or empty , json.length() defines the length of string
-                return;
-            }
+                        if (jsonOriginal == null || jsonOriginal.length() < 1) { // JSON is null or empty , jsonOriginal.length() defines the length of string
+                            return;
+                        }
 
-            usgs<String, metadata1, features1<properties1, geometry1>, Float> items = gson.fromJson(json, listType);
-
-
-            if (items == null || items.getFeatures() == null || items.getFeatures().size() == 0) { //check if item null or items' features null or item's features empty
-                return;
-            }
-
-            for (features1<properties1, geometry1> item : items.getFeatures()) { //each item means each feature, which is each earthquake record
-
-                String str1 = item.getProperties().getPlace().trim().toUpperCase();
-
-                String str2 = str1.substring(str1.indexOf("of") + 3); //look json, the title is like "228km NW of Saumlaki, Indonesia"
-
-                EarthQuakes eq = new EarthQuakes(); //EarthQuakes is a bean
-                eq.setSig(item.getProperties().getSig());
-                eq.setDateMilis(Long.parseLong(item.getProperties().getTime()));
-                eq.setDepth(round(item.getGeometry().getCoordinates().get(2), decimalPlace)); //depth means altitude. In this way, database is getting updated
-                eq.setLatitude(item.getGeometry().getCoordinates().get(1));
-                eq.setLongitude(item.getGeometry().getCoordinates().get(0));
-                eq.setLocationName(str2);
-                eq.setMagnitude(round(item.getProperties().getMag(), decimalPlace));
-                eq.Insert();
-                Log.i("Sig", String.valueOf(eq.getSig()));
+                        Log.i("Jsonoriginal", jsonOriginal);
+                        POJOUSGS<String, MetadataUSGS, FeaturesUSGS<PropertiesUSGS, GeometryUSGS>, Float> items = gson.fromJson(jsonOriginal, listType);
 
 
-                if (CheckRiskEarthquakes.checkRisky(eq)) {
+                        if (items == null || items.getFeatures() == null || items.getFeatures().size() == 0) { //check if item null or items' FeaturesUSGS null or item's FeaturesUSGS empty
+                            return;
+                        }
+
+                        Log.i("items", items.toString());
+
+                        databaseReference.child("realTimeEarthquakes").setValue(items); //upload jsonOriginal on new "realTimeEarthquakes" node
+                        String jsonString = "{  \n" +
+                                "      \"metaInfo\": {\n" +
+                                "        \"count\": \"serversCount\",\n" +
+                                "        \"needToBeServer\": \"false\"\n" +
+                                "      },\n" +
+                                "      \"servers\": [\n" +
+                                "        {\n" +
+                                "          \"id\": \"myid\",\n" +
+                                "          \"lastOnline\": \"timeMilis\"\n" +
+                                "        }\n" +
+                                "      ]\n" +
+                                "   }\n";
+                        Map<String, Object> jsonMap = new Gson().fromJson(jsonString, new TypeToken<HashMap<String, Object>>() {
+                        }.getType());
 
 
-                    String str11 = item.getProperties().getPlace().trim().toUpperCase();
+                        databaseReference.child("serverTrack").setValue(jsonMap); //upload jsonOriginal on new "realTimeEarthquakes" node
 
-                    String str22 = str1.substring(str1.indexOf("of") + 3); //look json, the title is like "228km NW of Saumlaki, Indonesia"
 
-                    RiskyEarthquakes riskyEarthquakes = new RiskyEarthquakes(); //RiskyEarthQuakes is a bean
-                    riskyEarthquakes.setSig(item.getProperties().getSig());
-                    riskyEarthquakes.setDateMilis(Long.parseLong(item.getProperties().getTime()));
-                    riskyEarthquakes.setDepth(round(item.getGeometry().getCoordinates().get(2), decimalPlace)); //depth means altitude. In this way, database is getting updated
-                    riskyEarthquakes.setLatitude(item.getGeometry().getCoordinates().get(1));
-                    riskyEarthquakes.setLongitude(item.getGeometry().getCoordinates().get(0));
-                    riskyEarthquakes.setLocationName(str2);
-                    riskyEarthquakes.setMagnitude(round(item.getProperties().getMag(), decimalPlace));
-                    riskyEarthquakes.Insert();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
+            }).start();
+
 
         } catch (Exception e) {
             OnLineTracker.catchException(e);
         }
 
-    }
-
-    private String getJson(String reqUrl) throws Exception {
-        Request request = new Request.Builder().url(reqUrl).build(); //Request builder is used to get JSON url
-        Response response = new OkHttpClient().newCall(request).execute(); //OkHttpClient is HTTP client to request
-        return response.isSuccessful() ? response.body().string() : "";
     }
 
     public float round(float d, int decimalPlace) {

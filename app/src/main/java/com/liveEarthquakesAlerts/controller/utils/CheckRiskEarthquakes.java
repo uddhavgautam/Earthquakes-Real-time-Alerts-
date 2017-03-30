@@ -7,7 +7,7 @@ import com.liveEarthquakesAlerts.model.database.EarthQuakes;
 import com.liveEarthquakesAlerts.model.database.RiskyEarthquakes;
 
 /**
- * Created by uddhav on 3/24/17.
+ * Created by  Uddhav Gautam  on 3/24/17.
  */
 
 public class CheckRiskEarthquakes {
@@ -28,6 +28,28 @@ public class CheckRiskEarthquakes {
 
 
             if (distanceValInMiles < 200 && item.getSig() > 500) { //we assume risky, need collaboration with GeoScientist
+                status = true;
+            }
+        }
+        return status;
+    }
+
+
+    public static boolean checkRisky(Float latitude, Float longitude, Integer sig) {
+        Location userLocation = LocationPOJO.location;
+
+        Location finalLoc = new Location("Risky Earthquake");
+        finalLoc.setLatitude(latitude);
+        finalLoc.setLongitude(longitude);
+
+        boolean status = false;
+
+        if (userLocation != null) {
+            double distanceInMeters = finalLoc.distanceTo(userLocation);
+            double distanceValInMiles = distanceInMeters * 0.000621371;
+
+
+            if (distanceValInMiles < 200 && sig > 500) { //we assume risky, need collaboration with GeoScientist
                 status = true;
             }
         }

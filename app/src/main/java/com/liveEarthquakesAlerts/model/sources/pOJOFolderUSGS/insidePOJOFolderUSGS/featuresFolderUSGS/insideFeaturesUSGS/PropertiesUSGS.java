@@ -1,9 +1,9 @@
-package com.liveEarthquakesAlerts.model.sources.usgsFolder.insideUsgs.featuresFolder.insideFeatures;
+package com.liveEarthquakesAlerts.model.sources.pOJOFolderUSGS.insidePOJOFolderUSGS.featuresFolderUSGS.insideFeaturesUSGS;
 
 /**
- * Created by uddhav Gautam on 7.3.2016. upgautam@ualr.edu
+ * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
-public class properties1 {
+public class PropertiesUSGS {
 
     private float mag;
     private String place;
