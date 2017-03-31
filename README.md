@@ -10,6 +10,7 @@ Fetching the live-earthquakes and throwing real-time alerts to user and the emer
 
 
 
-![Alt text](/app/mainActivity1.png?raw=true "MainActivity1")
+![Alt text](/app/mainActivity1.png?raw=true "mainActivity1")
+
 
 
