@@ -10,6 +10,6 @@ Fetching the live-earthquakes and throwing real-time alerts to user and the emer
 
 
 
-https://github.com/uddhavgautam/LiveEarthquakesAlerts/app/mainActivity1.png
+![Alt text](/app/mainActivity1.png?raw=true "MainActivity1")
 
 
