@@ -10,7 +10,7 @@ Fetching the live-earthquakes and throwing real-time alerts to user and the emer
 
 
 
-![Alt text](/app/mainActivity1.png?raw=true "mainActivity1")
+![Alt text](/mainActivity1.png?raw=true "Dynamic Url-resource update frequency checker")
 
 
 
