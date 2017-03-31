@@ -9,8 +9,28 @@ Real-time applications have several advantages in several domains (“Google” 
 Fetching the live-earthquakes and throwing real-time alerts to user and the emergency contacts is critical in earthquake risk zones. The robust tool equipped with latest tools and technology is needed to better solve this issue. This is why “Earthquakes Notification Tool” introduced. And this tool solves this issue by integrating several modules such as: Google Firebase CDN (“Firebase | App Success Made Simple” 2017), Dynamic-Resource-Frequency-Checker (“Dynamic-Resource-UpdateChecker - Android Apps on Google Play” 2017a) for USGS JSON resource, Continuous-Location-Tracker, Contacts-Sync-Module, Observer pattern for the Google CDN JSON. The “Earthquakes Notification Tool” is best because each modules are optimized and the communication logic is optimized.
 
 
+MainActivity Screen
+![Alt text](/mainActivity1.png?raw=true "mainActivity1")
+![Alt text](/mainActivity2.png?raw=true "mainActivity2")
+![Alt text](/bannerMile.png?raw=true "bannerMile")
 
-![Alt text](/mainActivity1.png?raw=true "Dynamic Url-resource update frequency checker")
+
+
+SettingsActivity Screen
+![Alt text](/Settings.png?raw=true "Settings.png")
+![Alt text](/Settings.png2?raw=true "Settings2.png")
+
+MapsActivity Screen
+![Alt text](/Maps1.png?raw=true "Maps1")
+![Alt text](/Maps2.png?raw=true "Maps2")
+
+
+Contacts Module Screens
+![Alt text](/eContacts1.png?raw=true "eContacts1")
+![Alt text](/eContacts2.png?raw=true "eContacts2")
+![Alt text](/eContacts3.png?raw=true "eContacts3")
+
+
 
 
 
