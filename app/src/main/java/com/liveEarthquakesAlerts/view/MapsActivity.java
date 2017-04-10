@@ -190,7 +190,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-
     @Override
     public void onMapReady(GoogleMap gmap) {
         //DO WHATEVER YOU WANT WITH GOOGLEMAP

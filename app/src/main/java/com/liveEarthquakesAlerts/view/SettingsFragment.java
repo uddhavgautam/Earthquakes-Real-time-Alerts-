@@ -11,7 +11,6 @@ import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceGroup;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.liveEarthquakesAlerts.R;
@@ -23,9 +22,9 @@ import com.liveEarthquakesAlerts.controller.utils.AppSettings;
  */
 public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
     private String Key_TimeInterval, Key_Magnitude, Key_Proximity;
-    private String Key_Sorting, Key_EmergencyPhoneContactEnabled, Key_Notifications, Key_Vibration, Key_Sound;
+    private String Key_Sorting, Key_Emergency, Key_Notifications, Key_Vibration, Key_Sound;
     private ListPreference lpTimeInterval, lpMagnitude, lpSorting, lpProximity;
-    private CheckBoxPreference cbNotifications, cbVibration, cbSound, cbEmergencyContacts;
+    private CheckBoxPreference cbNotifications, cbVibration, cbSound, cbEmergency;
 
     @SuppressWarnings("deprecation")
     @Override
@@ -41,7 +40,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         Key_Notifications = getResources().getString(R.string.CheckBoxPref_Key_Notifications);
         Key_Vibration = getResources().getString(R.string.CheckBoxPref_Key_Vibration);
         Key_Sound = getResources().getString(R.string.CheckBoxPref_Key_Sound);
-        Key_EmergencyPhoneContactEnabled = getResources().getString(R.string.CheckBoxPref_Key_Phone);
+        Key_Emergency = getResources().getString(R.string.CheckBoxPref_Key_Emergency);
 
         lpProximity = (ListPreference) findPreference(Key_Proximity);
 
@@ -51,7 +50,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         cbNotifications = (CheckBoxPreference) findPreference(Key_Notifications);
         cbVibration = (CheckBoxPreference) findPreference(Key_Vibration);
         cbSound = (CheckBoxPreference) findPreference(Key_Sound);
-        cbEmergencyContacts = (CheckBoxPreference) findPreference(Key_EmergencyPhoneContactEnabled);
+        cbEmergency = (CheckBoxPreference) findPreference(Key_Emergency);
 
 
         lpProximity.setOnPreferenceChangeListener(this);
@@ -61,7 +60,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         cbNotifications.setOnPreferenceChangeListener(this);
         cbVibration.setOnPreferenceChangeListener(this);
         cbSound.setOnPreferenceChangeListener(this);
-        cbEmergencyContacts.setOnPreferenceChangeListener(this);
+        cbEmergency.setOnPreferenceChangeListener(this);
 
         initSummary(getPreferenceScreen());
 
@@ -69,11 +68,11 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         if (cbNotifications.isChecked()) {
             cbVibration.setEnabled(true);
             cbSound.setEnabled(true);
-            cbEmergencyContacts.setEnabled(true);
+            cbEmergency.setEnabled(true);
         } else {
             cbVibration.setEnabled(false);
             cbSound.setEnabled(false);
-            cbEmergencyContacts.setEnabled(false);
+            cbEmergency.setEnabled(false);
         }
     }
 
@@ -109,27 +108,30 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         if (p instanceof ListPreference) { //if p is instance of top level
             ListPreference listPref = (ListPreference) p;
             p.setSummary(listPref.getEntry());
-        }
-
-        if (p instanceof MultiSelectListPreference) {
+        } else if (p instanceof MultiSelectListPreference) {
             EditTextPreference editTextPref = (EditTextPreference) p;
             p.setSummary(editTextPref.getText());
-        }
-
-        if (p instanceof CheckBoxPreference) { //preference p can be instantiated from CheckBoxPreference
+        } else if (p instanceof CheckBoxPreference) { //preference p can be instantiated from CheckBoxPreference
             if (p instanceof PreferenceCategory) {
                 PreferenceCategory pCat = (PreferenceCategory) p;
                 if (pCat.getTitle().equals("Notifications")) {
                     CheckBoxPreference checkBoxPref = (CheckBoxPreference) p;
                     p.setSummary(checkBoxPref.isChecked() ? getResources().getString(R.string.statu_on) : getResources().getString(R.string.statu_off));
+                } else if (pCat.getTitle().equals("Emergency-Contacts")) {
+                    CheckBoxPreference checkBoxPref = (CheckBoxPreference) p;
+                    p.setSummary(checkBoxPref.isChecked() ? getResources().getString(R.string.sync_on) : getResources().getString(R.string.sync_off));
+                } else {
+                    //do nothing
                 }
             }
+        } else {
+            //do nothing
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
-        if (AppSettings.getInstance().isFavourite()) {
+        if (AppSettings.getInstance().isEmergency()) {
             Intent i = new Intent(getActivity(), MainActivity.class);
             i.putExtra("str", true); //(key,value)
             getActivity().setResult(getActivity().RESULT_OK, i); //100 is request code
@@ -144,11 +146,13 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         String value = newValue.toString();
         if (key.equalsIgnoreCase(Key_TimeInterval)) { //time interval
             lpTimeInterval.setSummary(lpTimeInterval.getEntries()[Integer.parseInt(value)]);
+
         } else if (key.equalsIgnoreCase(Key_Proximity)) { //proximity
             lpProximity.setSummary(lpProximity.getEntries()[Integer.parseInt(value)]);
-            Log.i("Summary", lpProximity.getEntries()[Integer.parseInt(value)].toString());
+
         } else if (key.equalsIgnoreCase(Key_Magnitude)) { //magnitude
             lpMagnitude.setSummary(lpMagnitude.getEntries()[Integer.parseInt(value)]);
+
         } else if (key.equalsIgnoreCase(Key_Sorting)) { //sorting
             lpSorting.setSummary(lpSorting.getEntries()[Integer.parseInt(value)]);
         } else if (key.equalsIgnoreCase(Key_Notifications)) {
@@ -156,7 +160,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
                 cbNotifications.setSummary(getResources().getString(R.string.statu_on));
                 cbVibration.setEnabled(true);
                 cbSound.setEnabled(true);
-                cbEmergencyContacts.setEnabled(true);
+                cbEmergency.setEnabled(true);
             } else {
                 cbNotifications.setSummary(getResources().getString(R.string.statu_off));
                 cbVibration.setEnabled(false);
@@ -165,9 +169,9 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
                 cbSound.setEnabled(false);
                 cbSound.setChecked(false);
                 cbSound.setSummary(getResources().getString(R.string.statu_off));
-                cbEmergencyContacts.setEnabled(false);
-                cbEmergencyContacts.setChecked(false);
-                cbEmergencyContacts.setSummary(getResources().getString(R.string.statu_off));
+                cbEmergency.setEnabled(false);
+                cbEmergency.setChecked(false);
+                cbEmergency.setSummary(getResources().getString(R.string.statu_off));
             }
         } else if (key.equalsIgnoreCase(Key_Vibration)) {
             if (value.equals("true")) {
@@ -181,11 +185,11 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
             } else {
                 cbSound.setSummary(getResources().getString(R.string.statu_off));
             }
-        } else if (key.equalsIgnoreCase(Key_EmergencyPhoneContactEnabled)) {
+        } else if (key.equalsIgnoreCase(Key_Emergency)) {
             if (value.equals("true")) {
-                cbEmergencyContacts.setSummary(getResources().getString(R.string.sync_on));
+                cbEmergency.setSummary(getResources().getString(R.string.sync_on));
             } else {
-                cbEmergencyContacts.setSummary(getResources().getString(R.string.sync_off));
+                cbEmergency.setSummary(getResources().getString(R.string.sync_off));
             }
         }
         return true;

@@ -62,13 +62,13 @@
             android:summaryOn="@string/statu_on"
             android:title="@string/CheckBoxPref_Title_Sound" />
         <CheckBoxPreference
-            android:defaultValue="@string/CheckBoxPref_DefaultValue_Phone"
+            android:defaultValue="@string/CheckBoxPref_DefaultValue_Emergency"
             android:disableDependentsState="true"
-            android:key="@string/CheckBoxPref_Key_Phone"
+            android:key="@string/CheckBoxPref_Key_Emergency"
             android:persistent="true"
             android:summaryOff="@string/sync_off"
             android:summaryOn="@string/sync_on"
-            android:title="@string/CheckBoxPref_Title_Phone" />
+            android:title="@string/CheckBoxPref_Title_Emergency" />
 
     </PreferenceCategory>
 

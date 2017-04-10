@@ -122,8 +122,8 @@ public class HomeActivity extends AppCompatActivity implements TabLayout.OnTabSe
             case R.id.menu_remove_emergency_contact:
                 ContentValues values = new ContentValues(); // a HashMap //This class is used to store a set of values that the ContentResolver can process.
 
-                values.put("isFavourite", "false");
-                resPartner.update(values, "isFavourite = ? ", "true"); //'where' in the query is 'key' or 'index' to search row
+                values.put("isEmergency", "false");
+                resPartner.update(values, "isEmergency = ? ", "true"); //'where' in the query is 'key' or 'index' to search row
 //(String table, String whereClause, String[] whereArgs)
                 /*
                 public int update(ContentValues values, String where, String... args) {

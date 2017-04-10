@@ -108,7 +108,7 @@ public class FavoriteFragment extends Fragment implements OListAdapter.OnViewBin
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) { //loader are threads, therefore, we see various callbacks
         Uri uri = Uri.parse("content://com.odoo.contacts.res_partner/res_partner");
-        return new CursorLoader(getContext(), uri, null, "isFavourite = ? ", new String[]{"true"}, null);
+        return new CursorLoader(getContext(), uri, null, "isEmergency = ? ", new String[]{"true"}, null);
     }
 
     @Override

@@ -17,57 +17,43 @@ public class AppSettings {
     public static AppSettings pojoPref = null;
     private static Context ctx = App.AppContext; //Get the same context of App class. Context is like security permission manager
 
-    private int TimeInterval, ProximityMiles, Magnitude, Sorting;
-    private boolean Notifications, isFavourite, Vibration, Sound; // for checking notification, vibration and sound whether to do ON/OFF
+    private int TimeInterval, Proximity, Magnitude, Sorting;
+    private boolean Notifications, Emergency, Vibration, Sound; // for checking notification, vibration and sound whether to do ON/OFF
 
-    private String Key_TimeInterval, Key_Magnitude, Key_Proxmity, ProximityMilesDesc;
-    private String Key_Sorting;
-    private String Key_Notifications;
-    private String Key_Vibration;
-    private String Key_Sound;
-    private String Key_Emergency;
+    private String Key_TimeInterval, Key_Magnitude, Key_Proxmity, Key_Sorting;
 
+    private String Key_Notifications, Key_Vibration, Key_Sound, Key_Emergency;
 
     AppSettings() { // constructor but no public. Because this class is based on Singleton design pattern
 
         Key_Proxmity = ctx.getResources().getString(R.string.listPref_Key_Proximity);
-
         Key_TimeInterval = ctx.getResources().getString(R.string.listPref_Key_TimeInterval);
         Key_Magnitude = ctx.getResources().getString(R.string.listPref_Key_Magnitude);
         Key_Sorting = ctx.getResources().getString(R.string.listPref_Key_Sorting);
+
+
         Key_Notifications = ctx.getResources().getString(R.string.CheckBoxPref_Key_Notifications);
         Key_Vibration = ctx.getResources().getString(R.string.CheckBoxPref_Key_Vibration);
         Key_Sound = ctx.getResources().getString(R.string.CheckBoxPref_Key_Sound);
-
-        isFavourite = false;
-
-        Key_Emergency = ctx.getResources().getString(R.string.CheckBoxPref_Key_Phone);
+        Key_Emergency = ctx.getResources().getString(R.string.CheckBoxPref_Key_Emergency);
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(ctx);
         Map<String, ?> allEntries = pref.getAll(); //generic hashmap<string as key, anything as value>
 
-        String asd = (String) allEntries.get(Key_TimeInterval); //return all values of  time interval (eg, last 24 hours)
+        Log.i("Allentries", allEntries.toString());
 
-        TimeInterval = Integer.parseInt(asd);
+        TimeInterval = Integer.parseInt((String) allEntries.get(Key_TimeInterval)); //return all values of  time interval (eg, last 24 hours)
         Magnitude = Integer.parseInt((String) allEntries.get(Key_Magnitude));
+        Proximity = Integer.parseInt((String) allEntries.get(Key_Proxmity));
         Sorting = Integer.parseInt((String) allEntries.get(Key_Sorting));
-
-        ProximityMilesDesc = (String) allEntries.get(Key_Proxmity);
-        Log.d("ProximityMilesDesc", ProximityMilesDesc);
 
         Notifications = (Boolean) allEntries.get(Key_Notifications);
         Vibration = (Boolean) allEntries.get(Key_Vibration);
         Sound = (Boolean) allEntries.get(Key_Sound);
-        isFavourite = (Boolean) allEntries.get(Key_Emergency);
+        Log.i("Sound", Sound + "");
+        Emergency = (Boolean) allEntries.get(Key_Emergency);
+        Log.i("Emergency Sound", Emergency + "");
 
-        if (isFavourite()) { //check through getter
-            setFavourite(isFavourite);
-        }
-        if (ProximityMilesDesc.equalsIgnoreCase("200 miles")) {
-            setProximityMiles(200);
-        } else if (ProximityMilesDesc.equalsIgnoreCase("World-wide")) {
-            setProximityMiles(0);
-        }
 
     }
 
@@ -80,20 +66,20 @@ public class AppSettings {
         return pojoPref == null ? new AppSettings() : pojoPref;
     }
 
-    public int getProximityMiles() {
-        return ProximityMiles;
-    }
-
-    public void setProximityMiles(int proximityMiles) {
-        ProximityMiles = proximityMiles;
-    }
-
     public int getTimeInterval() {
         return TimeInterval;
     }
 
     public void setTimeInterval(int timeInterval) {
         TimeInterval = timeInterval;
+    }
+
+    public int getProximity() {
+        return Proximity;
+    }
+
+    public void setProximity(int proximity) {
+        Proximity = proximity;
     }
 
     public int getMagnitude() {
@@ -136,11 +122,11 @@ public class AppSettings {
         Notifications = notifications;
     }
 
-    public boolean isFavourite() {
-        return isFavourite;
+    public boolean isEmergency() {
+        return Emergency;
     }
 
-    public void setFavourite(boolean favourite) {
-        isFavourite = favourite;
+    public void setEmergency(boolean emergency) {
+        Emergency = emergency;
     }
 }

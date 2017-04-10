@@ -1,11 +1,22 @@
 package com.liveEarthquakesAlerts.view;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
 import android.location.Location;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,29 +27,31 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.liveEarthquakesAlerts.R;
 import com.liveEarthquakesAlerts.controller.adapters.ListViewAdapter;
-import com.liveEarthquakesAlerts.controller.services.earthquakes.EarthquakesDataSyncService;
-import com.liveEarthquakesAlerts.controller.services.locations.LocationTracker;
+import com.liveEarthquakesAlerts.controller.services.locations.LocTrackIntentService;
 import com.liveEarthquakesAlerts.controller.utils.Animator;
 import com.liveEarthquakesAlerts.controller.utils.App;
 import com.liveEarthquakesAlerts.controller.utils.AppSettings;
 import com.liveEarthquakesAlerts.controller.utils.BusStatus;
 import com.liveEarthquakesAlerts.controller.utils.CheckRiskEarthquakes;
 import com.liveEarthquakesAlerts.controller.utils.CreateRequestUrl;
+import com.liveEarthquakesAlerts.controller.utils.MyOwnCustomLog;
 import com.liveEarthquakesAlerts.controller.utils.OnLineTracker;
 import com.liveEarthquakesAlerts.controller.utils.SaveResponseToDB;
+import com.liveEarthquakesAlerts.controller.utils.broadcastReceiver.IncomingReceiver;
+import com.liveEarthquakesAlerts.controller.utils.broadcastReceiver.OutgoingReceiver;
 import com.liveEarthquakesAlerts.model.LocationPOJO;
 import com.liveEarthquakesAlerts.model.database.EarthQuakes;
 import com.liveEarthquakesAlerts.model.database.LastEarthquakeDate;
 import com.liveEarthquakesAlerts.model.database.LastEarthquakeDateRisky;
+import com.liveEarthquakesAlerts.model.database.RiskyEarthquakes;
+import com.odoo.FavoriteNumberBean;
 import com.squareup.otto.Subscribe;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,7 +60,10 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener, OnScrollListener {
 
     public static String bannerText;
+    public static Context mainApplicationContext;
+    public static Intent locInitServiceIntent;
     private final String TAG = "MainActivity";
+    public String messageEarthquake;
     private ProgressDialog pd;
     private ListView list;
     private int currentScrollState, currentFirstVisibleItem, currentVisibleItemCount, currentTotalItemCount;
@@ -55,11 +71,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private TextView tvEmptyMessage;
     private TextView tvBanner;
     private boolean isConnectToInternet = true;
+    private IncomingReceiver incomingReceiver;
+    private OutgoingReceiver outgoingReceiver;
+    private MyOwnCustomLog myOwnCustomLog = new MyOwnCustomLog();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
+        mainApplicationContext = getApplicationContext();
         super.onCreate(savedInstanceState);
+
+        //I did broadcast receiver registration for my intent filter in main thread
+
+        StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
+        String simpleName = this.getClass().getSimpleName();
+        myOwnCustomLog.addLog(simpleName, Thread.currentThread().getStackTrace()[2].getMethodName().toString(), stackTraces);
+
+
         setContentView(R.layout.activity_main);
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar1);
@@ -84,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Log.i("Datemilis", String.valueOf(led.getDateMilis()));
             led.Insert(); //this ultimately creates a earthquake row
             //this ensures the LastEarthquakeDate table is not null
-
         }
 
         if (new LastEarthquakeDateRisky().GetRowCount() == 0) {
@@ -92,9 +118,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             led.setDateMilis(606175200000l);
             Log.i("Datemilis", String.valueOf(led.getDateMilis()));
             led.Insert();
-
         }
-
 
         tvEmptyMessage = (TextView) findViewById(R.id.tv_empty_message);
         tvBanner = (TextView) findViewById(R.id.mile_banner);
@@ -103,69 +127,93 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // earthquakes record in GUI
 
         list.setOnItemLongClickListener(this); // adds listeners on that ListView
-        list.setOnScrollListener(this); //
+        list.setOnScrollListener(this);
         list.setOnItemClickListener(this);
 
-//        start service to track user location
-        if (!LocationTracker.isServiceRunning) { //if service not running
-            Intent intent = new Intent(getApplicationContext(), LocationTracker.class); //start service
-            startService(intent);
-        }
 
-        initializeFirebaseRealtimeDB();
-
-
-//        start service to fetch earthquakes
-
-        Intent intent = new Intent(getBaseContext(), EarthquakesDataSyncService.class); //start service
-        startService(intent);
-
-        pd = new ProgressDialog(MainActivity.this); //show progressbar
-        pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        pd.setTitle(getString(R.string.PleaseWait));
-        pd.setMessage(getString(R.string.DatasLoading));
-        pd.setCancelable(true);
-        pd.setIndeterminate(true);
-        pd.show();
+        initializeFirebaseRealtimeDB(); //completed
 
     }
 
     private void initializeFirebaseRealtimeDB() {
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot();
-        Log.i("reference1", databaseReference.toString());
+        Log.i("DbReference", databaseReference + "");
 
-        final ValueEventListener valueEventListener = new ValueEventListener() {
+        Thread newThread = new Thread(new Runnable() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.getChildren().iterator().hasNext()) {//empty
+            public void run() {
+                //if there is data. Don't do null checking using "==" operator.
+                String myVarData = SaveResponseToDB.getFirebaseWholeData("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes.json?print=pretty");
+                Log.i("myVarData", "hdfkdfj" + myVarData);
+                if ((!myVarData.equals(null)) && (myVarData != "")) { //realtime db already exists
+                    Log.i("else", "inside elsewer, realtime DB already exists");
+//                    create Firebase Realtime DB jsonOriginal structure and upload earthquake JSON
+                    SaveResponseToDB.isInitialized = true;
+                    Intent intent = new Intent();
+                    intent.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("isInitializedAlready", SaveResponseToDB.isInitialized);
+                    sendBroadcast(intent);
 
-                    //create Firebase Realtime DB jsonOriginal structure and upload earthquake JSON
 
+                } else {
+                    Log.i("else", "no real time db");
+                    SaveResponseToDB.isInitialized = false;//initialized but not properly. Therefore isInitialized = false
                     SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
-                    clientHelper.updateFirebase(CreateRequestUrl.URL_USGS(0), databaseReference);
-
-//                    unregister valueEventListener
-                    databaseReference.removeEventListener(this);
+                    clientHelper.updateFirebase(CreateRequestUrl.URL_USGS(), databaseReference);
                 }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
 
             }
-        };
-        databaseReference.addValueEventListener(valueEventListener);
+        });
+        newThread.start();
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart() { //main thread
         super.onStart();
-        App.bus.register(this); //registration of Otto Bus
+
+        //show the log
+        StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
+        String simpleName = this.getClass().getSimpleName();
+        myOwnCustomLog.addLog(simpleName, Thread.currentThread().getStackTrace()[2].getMethodName().toString(), stackTraces);
+
+        //make sure firebase realtime DB initialized completed. Why? Because as LocTrackIntentService gets the location
+        //I start fetching from firebase. There I create reference. If I don't have already initialized, then it throws null pointer
+        //exception on those references
+        locInitServiceIntent = new Intent(this, LocTrackIntentService.class);
+
+        //main thread should not be blocked. Therefore, two solutions here:
+        //1) Either I create another thread and run startService(locInitServiceIntent) from there. Make the created thread never dies and listen from the thread when I updated firebase database
+        //2) BroadcastReceiver. Since there is chain like "main thread> another threadX > main therad > another thread> another thread> main thread> another threadZ. Our situation is like communication threadX and threadZ.
+
+        incomingReceiver = new IncomingReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getBooleanExtra("isInitializedAlready", false)) { //it means already initialized
+                    Log.i(TAG, "Successfully loctracking service is triggered!");
+                    startService(locInitServiceIntent);
+                }
+            }
+        };
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("SaveResponseToDB.isInitialized.Uddhav");
+        registerReceiver(incomingReceiver, intentFilter);
+
+
+        App.bus.register(this);
+
+//        pd = new ProgressDialog(MainActivity.this); //show progressbar
+//        pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+//        pd.setTitle(getString(R.string.PleaseWait));
+//        pd.setMessage(getString(R.string.DatasLoading));
+//        pd.setCancelable(true);
+//        pd.setIndeterminate(true);
+//        pd.show();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        unregisterReceiver(incomingReceiver);
         App.bus.unregister(this); //Unregister of Otto Bus
     }
 
@@ -188,6 +236,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Subscribe
     public void messageReceived(BusStatus event) {
+        Log.i("Bus", "after msg received");
+
         Log.i("MainActivity", event.getStatus() + " ");
 
         if (event.getStatus() == 999) {
@@ -195,29 +245,60 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             list.setEmptyView(tvEmptyMessage);
             list.setAdapter(null);
         } else {
-            isConnectToInternet = true;
+
+
+            RiskyEarthquakes riskyEarthquakes = new RiskyEarthquakes();
+            List<RiskyEarthquakes> allRiskyEarthquakes = riskyEarthquakes.GetAllData();
+
+//          update the RiskyEarthquakes
+            for (RiskyEarthquakes r : allRiskyEarthquakes) {
+                if (!CheckRiskEarthquakes.checkRisky(r)) {
+                    r.DeleteRow(r.getDateMilis());
+                }
+            }
+
+            for (RiskyEarthquakes r : allRiskyEarthquakes) {
+                while (CheckRiskEarthquakes.checkRisky(r)) {
+                    //Notify user
+                    notificationHandler();
+                    //Notify emergency only one time, then pop the "I am Ok" button to click and push messages "I am ok"
+                    sendMsgToEmergencyContacts();
+                }
+            }
+
+
+//update the adapter
             List<EarthQuakes> EarthQuakeList;
             Log.i("ConnectInternet", "true");
-            if (AppSettings.getInstance().getProximityMiles() == 0) {
+            if (AppSettings.getInstance().getProximity() == 1) {
                 EarthQuakeList = new EarthQuakes().GetAllDataUserProximity();
-            } else {
+                if (EarthQuakeList.size() > 0) {
+                    adapter = new ListViewAdapter(MainActivity.this, EarthQuakeList);
+                    adapter.notifyDataSetChanged();
+                    list.setAdapter(adapter);
+                    list.setSelectionFromTop(currentFirstVisibleItem, 0); // (x,y)
+                }
+            }
+
+            if (AppSettings.getInstance().getProximity() == 0) {
                 EarthQuakeList = new EarthQuakes().GetAllData();
-            }
-            if (EarthQuakeList.size() > 0) {
-                Log.i("EarthquakeData", "Yes");
-                adapter = new ListViewAdapter(MainActivity.this, EarthQuakeList);
-                adapter.notifyDataSetChanged();
-                list.setAdapter(adapter);
-                list.setSelectionFromTop(currentFirstVisibleItem, 0); // (x,y)
-            }
 
+                if (EarthQuakeList.size() > 0) {
+                    adapter = new ListViewAdapter(MainActivity.this, EarthQuakeList);
+                    adapter.notifyDataSetChanged();
+                    list.setAdapter(adapter);
+                    list.setSelectionFromTop(currentFirstVisibleItem, 0); // (x,y)
+                }
+            }
         }
 
-        if (pd != null && pd.isShowing()) {
-            Log.i("Inside pd", "pd is running");
-            pd.dismiss();
-            pd = null;
-        }
+        //stop the progress bar
+
+//        if (pd != null && pd.isShowing()) {
+//            Log.i("Inside pd", "pd is running");
+//            pd.dismiss();
+//            pd = null;
+//        }
     }
 
     @Override
@@ -231,7 +312,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public boolean onPrepareOptionsMenu(Menu menu) {
 //            Show the Emergency contact icon
         Log.i("Visible", String.valueOf(View.VISIBLE));
-        if (AppSettings.getInstance().isFavourite()) {
+        if (AppSettings.getInstance().isEmergency()) {
             menu.getItem(0).setVisible(true);
 //            On every emergency contacts enabled, animate the Emergency contact icon. Will do later
 
@@ -287,7 +368,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
+                         int totalItemCount) {
         this.currentFirstVisibleItem = firstVisibleItem;
         this.currentVisibleItemCount = visibleItemCount;
         this.currentTotalItemCount = totalItemCount;
@@ -327,6 +409,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             bannerText = String.format("%.2f", distanceValInMiles) + " miles far!";
             tvBanner.setText(bannerText);
 
+        } else {
+            Log.i(TAG, "User location null!");
         }
     }
 
@@ -368,5 +452,87 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
+
+    public void notificationHandler() {
+        showNotification();
+    }
+
+    public void showNotification() {
+        List<RiskyEarthquakes> newEarthquakes = new RiskyEarthquakes().newEarthquakes();
+
+        if (newEarthquakes.size() > 0) { //if there are earthquakes
+
+            if (AppSettings.getInstance().isNotifications()) {
+                createNotification(getString(R.string.EarthquakesDetect), "" + newEarthquakes.get(0).getMagnitude() + "  |  " + newEarthquakes.get(0).getLocationName());
+                messageEarthquake = "Earthquake Hit !!" + newEarthquakes.get(0).getMagnitude() + "  |  " + newEarthquakes.get(0).getLocationName();
+
+            }
+
+
+            LastEarthquakeDate led = new LastEarthquakeDate();
+            led.setDateMilis(new EarthQuakes().GetLastEarthQuakeDate());
+            led.Insert();
+        }
+    }
+
+    public void sendMsgToEmergencyContacts() {
+        FavoriteNumberBean favoriteNumberBean = new FavoriteNumberBean(false);
+        ArrayList<String> mobileList = favoriteNumberBean.getMobileNumber();
+        SmsManager smsManager = SmsManager.getDefault();
+        //send every emergency contacts the messages
+        for (String phone : mobileList) {
+            smsManager.sendTextMessage(phone, null, messageEarthquake, null, null);
+        }
+        //now create "I am Ok button", tap it to send "I am Ok" messages to every emergency contacts
+
+        //create a floating button
+        FloatingActionButton floatingActionButton = new FloatingActionButton(getApplicationContext());
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FavoriteNumberBean favoriteNumberBean = new FavoriteNumberBean(false);
+                ArrayList<String> mobileList = favoriteNumberBean.getMobileNumber();
+                SmsManager smsManager = SmsManager.getDefault();
+                //send every emergency contacts the messages
+                for (String phone : mobileList) {
+                    smsManager.sendTextMessage(phone, null, "I am Ok!", null, null);
+                }
+            }
+        });
+    }
+
+    public void createNotification(String strContentTitle, String strContentText) {
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext()) //
+                .setSmallIcon(R.drawable.icon1) //
+                .setContentTitle(strContentTitle) //
+                .setContentText(strContentText);
+
+        Intent resultIntent = new Intent(this, MainActivity.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        builder.setContentIntent(resultPendingIntent);
+        builder.setAutoCancel(true);
+        builder.setLights(Color.BLUE, 500, 500);
+
+        if (AppSettings.getInstance().isVibration()) {
+            long[] pattern = {500, 500};
+            builder.setVibrate(pattern);
+        }
+        if (AppSettings.getInstance().isSound()) {
+            Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            builder.setSound(alarmSound);
+        }
+
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(0, builder.build());
+    }
 }

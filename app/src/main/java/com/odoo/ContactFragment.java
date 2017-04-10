@@ -107,7 +107,7 @@ public class ContactFragment extends Fragment implements
         stringMobile = row.getString("mobile");
         stringImage = row.getString("image_medium");
 //        stringCompanyType = row.getString("company_type");
-        stringToggle = row.getString("isFavourite");
+        stringToggle = row.getString("isEmergency");
 
 
         textContactName.setText(stringName);
@@ -144,10 +144,10 @@ public class ContactFragment extends Fragment implements
                 favToogleCache.put(row.getInt("_id"), toggleFavourite.isChecked());
                 String favString = " marked emergency contacts";
                 if (toggleFavourite.isChecked()) {
-                    values.put("isFavourite", "true"); //(key, value)
+                    values.put("isEmergency", "true"); //(key, value)
                 } else {
                     favString = " unmarked from emergency contacts";
-                    values.put("isFavourite", "false");
+                    values.put("isEmergency", "false");
                 }
                 Toast.makeText(getContext(), "Contact " + favString, Toast.LENGTH_SHORT).show();
 

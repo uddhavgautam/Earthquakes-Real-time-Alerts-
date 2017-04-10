@@ -46,7 +46,7 @@
         android:required="true" />
 
     <application
-        android:name="com.liveEarthquakesAlerts.controller.utils.App"
+        android:name=".controller.utils.App"
         android:allowBackup="true"
         android:configChanges="orientation"
         android:icon="@mipmap/ic_launcher"
@@ -62,7 +62,7 @@
             android:value="@string/LiveEarthquakesAlerts" />
 
         <activity
-            android:name="com.liveEarthquakesAlerts.view.MainActivity"
+            android:name=".view.MainActivity"
             android:label="@string/title_activity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -70,12 +70,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.liveEarthquakesAlerts.view.MapsActivity" />
+        <activity android:name=".view.MapsActivity" />
 
         <service
-            android:name="com.liveEarthquakesAlerts.controller.services.earthquakes.EarthquakesDataSyncService"
-            android:exported="false" />
-
+            android:name=".controller.services.earthquakes.EarthquakeIntentService"
+            android:enabled="true"
+            android:exported="true" />
         <service android:name="com.odoo.auth.OdooAuthenticatorServices">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
@@ -90,7 +90,7 @@
             android:name="com.odoo.HomeActivity"
             android:label="@string/title_activity_home"
             android:launchMode="singleTop"
-            android:parentActivityName="com.liveEarthquakesAlerts.view.MainActivity">
+            android:parentActivityName=".view.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.liveEarthquakesAlerts.view.MainActivity" />
@@ -133,16 +133,38 @@
         <activity android:name="com.odoo.AddContact" />
         <activity android:name="com.odoo.SearchContactActivity" />
         <activity
-            android:name="com.liveEarthquakesAlerts.view.SettingsActivity"
-            android:parentActivityName="com.liveEarthquakesAlerts.view.MainActivity">
+            android:name=".view.SettingsActivity"
+            android:parentActivityName=".view.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.liveEarthquakesAlerts.view.MainActivity" />
         </activity>
 
         <service
-            android:name="com.liveEarthquakesAlerts.controller.services.locations.LocationTracker"
-            android:exported="false"></service>
+            android:name=".controller.services.locations.LocTrackIntentService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <!--<receiver-->
+        <!--android:name=".controller.utils.broadcastReceiver.IncomingReceiver"-->
+        <!--android:enabled="true"-->
+        <!--android:exported="true">-->
+        <!--&lt;!&ndash;<intent-filter>&ndash;&gt;-->
+        <!--&lt;!&ndash;<action android:name="SaveResponseToDB.isInitialized.Uddhav" />&ndash;&gt;-->
+        <!--&lt;!&ndash;</intent-filter>&ndash;&gt;-->
+        <!--</receiver>-->
+
+        <!--<receiver-->
+        <!--android:name=".controller.utils.broadcastReceiver.OutgoingReceiver"-->
+        <!--android:enabled="true"-->
+        <!--android:exported="true">-->
+        <!--&lt;!&ndash;<intent-filter>&ndash;&gt;-->
+        <!--&lt;!&ndash;<action android:name="SaveResponseToDB.isInitialized.Uddhav" />&ndash;&gt;-->
+        <!--&lt;!&ndash;</intent-filter>&ndash;&gt;-->
+
+        <!--</receiver>-->
+
+
     </application>
 
 </manifest>

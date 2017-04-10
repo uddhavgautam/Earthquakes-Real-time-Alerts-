@@ -6,20 +6,19 @@
     <!-- ############ date_range ################## -->
 
     <string name="listPref_DialogTitle_TimeInterval">Time Interval</string>
-    <string name="listPref_Summary_TimeInterval">Last Hour</string>
-    <string name="listPref_Title_TimeInterval">Time Interval</string>
+    <string name="listPref_Summary_TimeInterval">Last 7 Hours</string>
+    <string name="listPref_Title_TimeInterval">Select TimeInterval</string>
     <string name="listPref_Key_TimeInterval">Key_TimeInterval</string>
     <string name="listPref_DefaultValue_TimeInterval">0</string>
 
     <string-array name="array_TimeInterval">
+        <item>Last 7 Hours</item>
         <item>Last Hour</item>
-        <item>Last 24 Hours</item>
-        <item>Last 7 Days</item>
+
     </string-array>
     <string-array name="array_TimeInterval_Values">
         <item>0</item>
         <item>1</item>
-        <item>2</item>
     </string-array>
 
     <!-- ############# source_list ################# -->
@@ -55,7 +54,7 @@
 
     <string name="listPref_DialogTitle_Sorting">Sorting</string>
     <string name="listPref_Summary_Sorting">Descending Date</string>
-    <string name="listPref_Title_Sorting">Sorting</string>
+    <string name="listPref_Title_Sorting">Select Sorting</string>
     <string name="listPref_Key_Sorting">Key_Sorting</string>
     <string name="listPref_DefaultValue_Sorting">1</string>
 
@@ -77,14 +76,14 @@
     <!-- ############# proximity ################# -->
 
     <string name="listPref_DialogTitle_Proximity">Proximity</string>
-    <string name="listPref_Summary_Proximity">User Proximity</string>
-    <string name="listPref_Title_Proximity">Proximity</string>
+    <string name="listPref_Summary_Proximity">World-wide</string>
+    <string name="listPref_Title_Proximity">Select Proximity</string>
     <string name="listPref_Key_Proximity">Key_Proximity</string>
-    <string name="listPref_DefaultValue_Proximity">200 miles</string>
+    <string name="listPref_DefaultValue_Proximity">0</string>
 
     <string-array name="array_Proximity">
-        <item>User Proximity</item>
         <item>World-wide</item>
+        <item>User Proximity</item>
     </string-array>
     <string-array name="array_Proximity_Values">
         <item>0</item>
@@ -115,9 +114,9 @@
 
 
     <!-- Phone Contacts-->
-    <string name="CheckBoxPref_Title_Phone">Emergency Contacts</string>
-    <string name="CheckBoxPref_Key_Phone">Key_Phone</string>
-    <string name="CheckBoxPref_DefaultValue_Phone">true</string>
+    <string name="CheckBoxPref_Title_Emergency">Emergency-Contacts</string>
+    <string name="CheckBoxPref_Key_Emergency">Key_Emergency</string>
+    <string name="CheckBoxPref_DefaultValue_Emergency">true</string>
 
 
     <string name="statu_on">On</string>

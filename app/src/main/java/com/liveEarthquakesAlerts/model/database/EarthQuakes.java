@@ -75,19 +75,18 @@ public class EarthQuakes implements Parcelable, Comparator<EarthQuakes> {
 
         int value = AppSettings.getInstance().getTimeInterval();
 
-        int goBack = 7;
-
+        int goBack = 1 * 3600 * 1000;
         if (value == 0) {
-            goBack = 0; //last hour
+            goBack = 7 * 3600 * 1000; //last 7 hours
         } else if (value == 1) {
-            goBack = 1; //last 1 day
-        } else if (value == 2) {
-            goBack = 7; //last 7 days
+            goBack = 3600000; //last hour
+        } else {
+            //do nothing
         }
 
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_MONTH, -goBack);
-        return cal.getTimeInMillis();
+
+        return (cal.getTimeInMillis() - goBack);
     }
 
     public int getSig() {
@@ -110,8 +109,10 @@ public class EarthQuakes implements Parcelable, Comparator<EarthQuakes> {
             EarthQuakes existenceCheck = MissionsInsert.queryForId(this.DateMilis);
 
             if (existenceCheck != null) {
+                Log.i("Delete", "delete and update");
                 MissionsInsert.update(this); //delete and then create
             } else {
+                Log.i("Create", "Create");
                 MissionsInsert.create(this);
             }
 
@@ -160,49 +161,44 @@ public class EarthQuakes implements Parcelable, Comparator<EarthQuakes> {
     }
 
     public List<EarthQuakes> GetAllDataUserProximity() {
-
         List<EarthQuakes> data = new ArrayList<>();
-
         try {
-
             Dao<EarthQuakes, Long> dao = DatabaseHelper.getDbHelper().getEarthQuakesDataHelper();
             QueryBuilder<EarthQuakes, Long> qBuilder = dao.queryBuilder();
-
             int sortingType = AppSettings.getInstance().getSorting();
             Long backdate = backDate();
 
-            qBuilder.where()//
-                    .gt("Magnitude", AppSettings.getInstance().getMagnitude()) //
-                    .and()//
-                    .gt("DateMilis", backdate)
-                    .and()//
-                    .gt("Latitude", LocationPOJO.location.getLatitude() - 2.91)
-                    .and()//
-                    .gt("Longitude", LocationPOJO.location.getLongitude() - 2.89)
-                    .and()//
-                    .lt("Latitude", LocationPOJO.location.getLatitude() + 2.91)
-                    .and()//
-                    .lt("Longitude", LocationPOJO.location.getLongitude() + 2.89);
+            if (LocationPOJO.location != null) {
+                qBuilder.where()//
+                        .gt("Magnitude", AppSettings.getInstance().getMagnitude()) //
+                        .and()//
+                        .gt("DateMilis", backdate)
+                        .and()//
+                        .gt("Latitude", LocationPOJO.location.getLatitude() - 2.91)
+                        .and()//
+                        .gt("Longitude", LocationPOJO.location.getLongitude() - 2.89)
+                        .and()//
+                        .lt("Latitude", LocationPOJO.location.getLatitude() + 2.91)
+                        .and()//
+                        .lt("Longitude", LocationPOJO.location.getLongitude() + 2.89);
 
-
-            if (sortingType == 0) {
-                qBuilder.orderBy("DateMilis", true);
-            } else if (sortingType == 1) {
-                qBuilder.orderBy("DateMilis", false);
-            } else if (sortingType == 2) {
-                qBuilder.orderBy("Magnitude", true);
-            } else if (sortingType == 3) {
-                qBuilder.orderBy("Magnitude", false);
+                if (sortingType == 0) {
+                    qBuilder.orderBy("DateMilis", true);
+                } else if (sortingType == 1) {
+                    qBuilder.orderBy("DateMilis", false);
+                } else if (sortingType == 2) {
+                    qBuilder.orderBy("Magnitude", true);
+                } else if (sortingType == 3) {
+                    qBuilder.orderBy("Magnitude", false);
+                }
+                PreparedQuery<EarthQuakes> pQuery = qBuilder.prepare();
+                data = dao.query(pQuery);
             }
 
-            PreparedQuery<EarthQuakes> pQuery = qBuilder.prepare();
-            data = dao.query(pQuery);
 
         } catch (SQLException e) {
             OnLineTracker.catchException(e);
         }
-
-//        Log.i("Row1", data.get(0).getLocationName());
         return data;
     }
 
