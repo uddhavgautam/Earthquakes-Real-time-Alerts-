@@ -31,7 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.liveEarthquakesAlerts.R;
 import com.liveEarthquakesAlerts.controller.adapters.ListViewAdapter;
-import com.liveEarthquakesAlerts.controller.services.locations.LocTrackIntentService;
+import com.liveEarthquakesAlerts.controller.services.locations.LocTrackService;
 import com.liveEarthquakesAlerts.controller.utils.Animator;
 import com.liveEarthquakesAlerts.controller.utils.App;
 import com.liveEarthquakesAlerts.controller.utils.AppSettings;
@@ -131,8 +131,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         list.setOnItemClickListener(this);
 
 
-
-
     }
 
     private void initializeFirebaseRealtimeDB() {
@@ -179,10 +177,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String simpleName = this.getClass().getSimpleName();
         myOwnCustomLog.addLog(simpleName, Thread.currentThread().getStackTrace()[2].getMethodName().toString(), stackTraces);
 
-        //make sure firebase realtime DB initialized completed. Why? Because as LocTrackIntentService gets the location
+        //make sure firebase realtime DB initialized completed. Why? Because as LocTrackService gets the location
         //I start fetching from firebase. There I create reference. If I don't have already initialized, then it throws null pointer
         //exception on those references
-        locInitServiceIntent = new Intent(this, LocTrackIntentService.class);
+        locInitServiceIntent = new Intent(this, LocTrackService.class);
 
         //main thread should not be blocked. Therefore, two solutions here:
         //1) Either I create another thread and run startService(locInitServiceIntent) from there. Make the created thread never dies and listen from the thread when I updated firebase database

@@ -21,7 +21,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
-import com.liveEarthquakesAlerts.controller.services.earthquakes.EarthquakeIntentService;
+import com.liveEarthquakesAlerts.controller.services.earthquakes.EarthquakeService;
 import com.liveEarthquakesAlerts.controller.utils.MyOwnCustomLog;
 import com.liveEarthquakesAlerts.model.LocationPOJO;
 
@@ -29,12 +29,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public class LocTrackIntentService extends Service
+public class LocTrackService extends Service
         implements LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    public static final String TAG = "LocTrackIntentService";
+    public static final String TAG = "LocTrackService";
     public static Handler mHandler;
     public static boolean isLocationUpdated = false;
     public int count = 0;
@@ -84,10 +84,10 @@ public class LocTrackIntentService extends Service
                             String postalCode = addresses.get(0).getPostalCode();
                             Log.i(TAG, address + ", " + city + ", " + state + ", " + postalCode + ", " + country);
 
-                            //now I got the location, start EarthquakeIntentService to fetch earthquakes
+                            //now I got the location, start EarthquakeService to fetch earthquakes
 
                             if (LocationPOJO.location != null)
-                                getApplicationContext().startService(new Intent(getApplicationContext(), EarthquakeIntentService.class));
+                                getApplicationContext().startService(new Intent(getApplicationContext(), EarthquakeService.class));
 
 
                         } catch (IOException e) {
@@ -117,7 +117,7 @@ public class LocTrackIntentService extends Service
 
     @Override
     public void onDestroy() {
-        Log.i(TAG, "LocTrackIntentService destroyed!");
+        Log.i(TAG, "LocTrackService destroyed!");
         super.onDestroy();
     }
 
@@ -131,7 +131,7 @@ public class LocTrackIntentService extends Service
     public int onStartCommand(Intent intent, int flags, int startId) { //main thread
         super.onStartCommand(intent, flags, startId);
 
-        Log.i(TAG, "inside thread of LocTrackIntentService!");
+        Log.i(TAG, "inside thread of LocTrackService!");
 
         buildGoogleApiClient();
         if (mGoogleApiClient != null) {
@@ -146,7 +146,7 @@ public class LocTrackIntentService extends Service
 //    @Override
 //    protected void onHandleIntent(@Nullable Intent intent) { //onHandleIntent thread
 //
-//        LocTrackIntentService.isRunning = true;
+//        LocTrackService.isRunning = true;
 //
 //        StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
 //        String simpleName = this.getClass().getSimpleName();

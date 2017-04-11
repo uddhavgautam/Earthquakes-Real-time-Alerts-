@@ -73,44 +73,44 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
 //            new Thread(new Runnable() { //should do network operation using separate thread; can't do from main thread
 //                @Override
 //                public void run() {
-                    try {
-                        jsonOriginal = getJson(url);
+            try {
+                jsonOriginal = getJson(url);
 
-                        if (jsonOriginal == null || jsonOriginal.length() < 1) { // JSON is null or empty , jsonOriginal.length() defines the length of string
-                            return;
-                        }
+                if (jsonOriginal == null || jsonOriginal.length() < 1) { // JSON is null or empty , jsonOriginal.length() defines the length of string
+                    return;
+                }
 
 //                        Log.i("Jsonoriginal", jsonOriginal);
-                        POJOUSGS<String, MetadataUSGS, FeaturesUSGS<PropertiesUSGS, GeometryUSGS>, Float> items = gson.fromJson(jsonOriginal, listType);
+                POJOUSGS<String, MetadataUSGS, FeaturesUSGS<PropertiesUSGS, GeometryUSGS>, Float> items = gson.fromJson(jsonOriginal, listType);
 
 
-                        if (items == null || items.getFeatures() == null || items.getFeatures().size() == 0) { //check if item null or items' FeaturesUSGS null or item's FeaturesUSGS empty
-                            return;
-                        }
+                if (items == null || items.getFeatures() == null || items.getFeatures().size() == 0) { //check if item null or items' FeaturesUSGS null or item's FeaturesUSGS empty
+                    return;
+                }
 
 //                        update only if there is new data. This condition should not be for the first time
-                        if (!SaveResponseToDB.isInitialized) { //first time
-                            doUpdate(items, databaseReference);
-                        } else {
-                            Long newDataTime = items.getMetadata().getGenerated();
-                            Long firebaseTime = getFirebaseTimeUsingCurl("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes/metadata/generated.json?print=pretty");
+                if (!SaveResponseToDB.isInitialized) { //first time
+                    doUpdate(items, databaseReference);
+                } else {
+                    Long newDataTime = items.getMetadata().getGenerated();
+                    Long firebaseTime = getFirebaseTimeUsingCurl("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes/metadata/generated.json?print=pretty");
 
 //                            Log.i("pkup usgs: ", newDataTime+"");
 //                            Log.i("pkup firebase: ", firebaseTime+"");
-                            Log.i("pkup usgs-firebase: ", String.valueOf(newDataTime - firebaseTime));
+                    Log.i("pkup usgs-firebase: ", String.valueOf(newDataTime - firebaseTime));
 
 
-                            if (newDataTime > firebaseTime) {
-                                doUpdate(items, databaseReference);
-                            } else {
-                                //do nothing
-                            }
-                        }
-
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    if (newDataTime > firebaseTime) {
+                        doUpdate(items, databaseReference);
+                    } else {
+                        //do nothing
                     }
+                }
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 //                }
 //            }).start();
 

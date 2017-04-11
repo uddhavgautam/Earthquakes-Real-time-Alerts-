@@ -73,7 +73,7 @@
         <activity android:name=".view.MapsActivity" />
 
         <service
-            android:name=".controller.services.earthquakes.EarthquakeIntentService"
+            android:name=".controller.services.earthquakes.EarthquakeService"
             android:enabled="true"
             android:exported="true" />
         <service android:name="com.odoo.auth.OdooAuthenticatorServices">
@@ -141,7 +141,7 @@
         </activity>
 
         <service
-            android:name=".controller.services.locations.LocTrackIntentService"
+            android:name=".controller.services.locations.LocTrackService"
             android:enabled="true"
             android:exported="false" />
 

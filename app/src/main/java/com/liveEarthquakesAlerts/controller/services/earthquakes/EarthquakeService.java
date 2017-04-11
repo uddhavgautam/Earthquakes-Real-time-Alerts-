@@ -28,22 +28,22 @@ import okhttp3.Response;
 /**
  * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
-public class EarthquakeIntentService extends Service {
+public class EarthquakeService extends Service {
 
-    private static final String TAG = "EarthquakeIntentService";
+    private static final String TAG = "EarthquakeService";
     private static long firebaseTime;
     private static long myLong = 1l;
     private DatabaseReference referenceEarthquakes;
 
 
-//    public EarthquakeIntentService() {
-//        super("EarthquakeIntentService");
+//    public EarthquakeService() {
+//        super("EarthquakeService");
 //    }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "EarthquakeIntentService created!");
+        Log.i(TAG, "EarthquakeService created!");
     }
 
 
@@ -179,7 +179,7 @@ public class EarthquakeIntentService extends Service {
     @Override
     public void onDestroy() {
         App.bus.unregister(this);
-        Log.i(TAG, "EarthquakeIntentService destroyed!");
+        Log.i(TAG, "EarthquakeService destroyed!");
     }
 
     @Nullable

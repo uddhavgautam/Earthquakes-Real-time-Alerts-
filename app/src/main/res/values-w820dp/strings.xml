@@ -6,8 +6,6 @@
     <string name="title_activity">EarthQuakes Alerts</string>
     <string name="EarthquakesDetect">Earthquake Detected!</string>
     <string name="NoConnection">Internet connection was not found!</string>
-    <string name="PleaseWait">Please Wait...</string>
-    <string name="DatasLoading">Loading...</string>
     <string name="MapCanNotBeDisplayed">Map can not be displayed</string>
 
 
