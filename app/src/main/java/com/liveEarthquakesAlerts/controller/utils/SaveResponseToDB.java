@@ -48,6 +48,7 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
     private static String TAG = "SaveResponseToDB";
     private static int unSuccessfulAttempts = 0;
     private static OutgoingReceiver outgoingReceiver;
+    private static POJOUSGS<String, MetadataUSGS, FeaturesUSGS<PropertiesUSGS, GeometryUSGS>, Float> items;
     private Integer sig, decimalPlace = 1;
     private long time;
     private Float longitude, latitude, depth, magnitude;
@@ -69,10 +70,6 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
             final Type listType = new TypeToken<POJOUSGS<String, MetadataUSGS, FeaturesUSGS<PropertiesUSGS, GeometryUSGS>, Float>>() {
             }.getType();
 
-
-//            new Thread(new Runnable() { //should do network operation using separate thread; can't do from main thread
-//                @Override
-//                public void run() {
             try {
                 jsonOriginal = getJson(url);
 
@@ -81,7 +78,7 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
                 }
 
 //                        Log.i("Jsonoriginal", jsonOriginal);
-                POJOUSGS<String, MetadataUSGS, FeaturesUSGS<PropertiesUSGS, GeometryUSGS>, Float> items = gson.fromJson(jsonOriginal, listType);
+                items = gson.fromJson(jsonOriginal, listType);
 
 
                 if (items == null || items.getFeatures() == null || items.getFeatures().size() == 0) { //check if item null or items' FeaturesUSGS null or item's FeaturesUSGS empty
@@ -95,9 +92,7 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
                     Long newDataTime = items.getMetadata().getGenerated();
                     Long firebaseTime = getFirebaseTimeUsingCurl("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes/metadata/generated.json?print=pretty");
 
-//                            Log.i("pkup usgs: ", newDataTime+"");
-//                            Log.i("pkup firebase: ", firebaseTime+"");
-                    Log.i("pkup usgs-firebase: ", String.valueOf(newDataTime - firebaseTime));
+                    Log.i("Time ", " difference USGS-Firebase: " + String.valueOf(newDataTime - firebaseTime));
 
 
                     if (newDataTime > firebaseTime) {
@@ -111,9 +106,6 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
             } catch (Exception e) {
                 e.printStackTrace();
             }
-//                }
-//            }).start();
-
 
         } catch (Exception e) {
             OnLineTracker.catchException(e);

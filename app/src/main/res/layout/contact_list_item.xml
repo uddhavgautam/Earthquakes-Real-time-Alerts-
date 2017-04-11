@@ -72,10 +72,11 @@
 
         <ToggleButton
             android:id="@+id/toggleIsFavourite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/toggle_selector"
-            android:backgroundTint="@color/statusbar"
+            android:backgroundTint="@color/colorAccent"
             android:checked="false"
             android:focusable="false"
             android:textOff=""

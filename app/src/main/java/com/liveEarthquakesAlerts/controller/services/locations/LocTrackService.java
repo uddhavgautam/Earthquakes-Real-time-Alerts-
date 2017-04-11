@@ -1,16 +1,28 @@
 package com.liveEarthquakesAlerts.controller.services.locations;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
+import android.telephony.SmsManager;
 import android.util.Log;
+import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -21,11 +33,20 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
+import com.liveEarthquakesAlerts.R;
 import com.liveEarthquakesAlerts.controller.services.earthquakes.EarthquakeService;
+import com.liveEarthquakesAlerts.controller.utils.AppSettings;
+import com.liveEarthquakesAlerts.controller.utils.CheckRiskEarthquakes;
 import com.liveEarthquakesAlerts.controller.utils.MyOwnCustomLog;
 import com.liveEarthquakesAlerts.model.LocationPOJO;
+import com.liveEarthquakesAlerts.model.database.EarthQuakes;
+import com.liveEarthquakesAlerts.model.database.LastEarthquakeDate;
+import com.liveEarthquakesAlerts.model.database.RiskyEarthquakes;
+import com.liveEarthquakesAlerts.view.MainActivity;
+import com.odoo.FavoriteNumberBean;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,11 +65,14 @@ public class LocTrackService extends Service
     public Location location; // location
     public LocationSettingsRequest mLocationSettingsRequest;
     private MyOwnCustomLog myOwnCustomLog = new MyOwnCustomLog();
+    private String messageEarthquake;
+    private Handler handler;
 
 
     @Override
     public void onCreate() {
         super.onCreate();
+        handler = new Handler(Looper.getMainLooper());
         Log.i(TAG, "On Create");
     }
 
@@ -143,41 +167,6 @@ public class LocTrackService extends Service
         return START_STICKY;
     }
 
-//    @Override
-//    protected void onHandleIntent(@Nullable Intent intent) { //onHandleIntent thread
-//
-//        LocTrackService.isRunning = true;
-//
-//        StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
-//        String simpleName = this.getClass().getSimpleName();
-//        myOwnCustomLog.addLog(simpleName, Thread.currentThread().getStackTrace()[2].getMethodName().toString(), stackTraces);
-//
-////        if (intent != null) {
-////            mReceiver = intent.getParcelableExtra("receiver");
-////        } //got the same resultReceiver of Activity
-//
-//        buildGoogleApiClient();
-//        if (mGoogleApiClient != null) {
-//            mGoogleApiClient.connect();
-//        } else {
-//            Log.i(TAG, "GoogleApiClient couldn't build!");
-//        }
-//
-//        mHandler = new Handler(Looper.myLooper()) {
-//            @Override
-//            public void handleMessage(Message msg) {
-//                Bundle bundle = msg.getData();
-//                if (bundle.getBoolean("locationStatus")) { //wait the response for the main thread
-////                    Looper.myLooper().quit();
-//                } else {
-//                    Log.i(TAG, "Couldn't get Location TOP");
-//                }
-//            }
-//        };
-//        Looper.loop(); //keep current thread alive
-//    }
-
-
     @Override
     public void onConnected(@Nullable Bundle bundle) { //This is Async request, obviously should be from the main thread. Because we are not sure,
         //after how many minutes it will get connected. Other threads are possible to die but not main thread
@@ -230,7 +219,103 @@ public class LocTrackService extends Service
             }
 
         }
+
+        RiskyEarthquakes riskyEarthquakes = new RiskyEarthquakes();
+        List<RiskyEarthquakes> allRiskyEarthquakes = riskyEarthquakes.GetAllData();
+
+//          update the RiskyEarthquakes
+        for (RiskyEarthquakes r : allRiskyEarthquakes) {
+            if (!CheckRiskEarthquakes.checkRisky(r)) {
+                r.DeleteRow(r.getDateMilis());
+            }
+        }
+
+        for (RiskyEarthquakes r : allRiskyEarthquakes) {
+            while (CheckRiskEarthquakes.checkRisky(r)) {
+                //Notify user
+                notificationHandler();
+                //Notify emergency only one time, then pop the "I am Ok" button to click and push messages "I am ok"
+                sendMsgToEmergencyContacts();
+            }
+        }
+    }
+
+    public void notificationHandler() {
+        showNotification();
+    }
+
+    public void showNotification() {
+        List<RiskyEarthquakes> newEarthquakes = new RiskyEarthquakes().newEarthquakes();
+
+        if (newEarthquakes.size() > 0) { //if there are earthquakes
+
+            if (AppSettings.getInstance().isNotifications()) {
+                createNotification(getString(R.string.EarthquakesDetect), "" + newEarthquakes.get(0).getMagnitude() + "  |  " + newEarthquakes.get(0).getLocationName());
+                messageEarthquake = "Earthquake Hit !!" + newEarthquakes.get(0).getMagnitude() + "  |  " + newEarthquakes.get(0).getLocationName();
+
+            }
+
+            LastEarthquakeDate led = new LastEarthquakeDate();
+            led.setDateMilis(new EarthQuakes().GetLastEarthQuakeDate());
+            led.Insert();
+        }
+    }
+
+    private void sendMsgToEmergencyContacts() {
+        FavoriteNumberBean favoriteNumberBean = new FavoriteNumberBean(false);
+        ArrayList<String> mobileList = favoriteNumberBean.getMobileNumber();
+        SmsManager smsManager = SmsManager.getDefault();
+//send every emergency contacts the messages
+        for (String phone : mobileList) {
+            smsManager.sendTextMessage(phone, null, messageEarthquake, null, null);
+        }
+//now create "I am Ok button", tap it to send "I am Ok" messages to every emergency contacts
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+//create a floating button
+                FloatingActionButton floatingActionButton = new FloatingActionButton(getApplicationContext());
+                floatingActionButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        FavoriteNumberBean favoriteNumberBean = new FavoriteNumberBean(false);
+                        ArrayList<String> mobileList = favoriteNumberBean.getMobileNumber();
+                        SmsManager smsManager = SmsManager.getDefault();
+//send every emergency contacts the messages
+                        for (String phone : mobileList) {
+                            smsManager.sendTextMessage(phone, null, "I am Ok!", null, null);
+                        }
+                    }
+                });
+            }
+        });
     }
 
 
+    private void createNotification(String strContentTitle, String strContentText) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext()) //
+                .setSmallIcon(R.drawable.icon1) //
+                .setContentTitle(strContentTitle) //
+                .setContentText(strContentText);
+        Intent resultIntent = new Intent(this, MainActivity.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(resultPendingIntent);
+        builder.setAutoCancel(true);
+        builder.setLights(Color.BLUE, 500, 500);
+        if (AppSettings.getInstance().isVibration()) {
+            long[] pattern = {500, 500};
+            builder.setVibrate(pattern);
+        }
+        if (AppSettings.getInstance().isSound()) {
+            Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            builder.setSound(alarmSound);
+        }
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(0, builder.build());
+    }
 }
+
+

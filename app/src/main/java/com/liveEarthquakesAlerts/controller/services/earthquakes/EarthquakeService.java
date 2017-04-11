@@ -35,11 +35,6 @@ public class EarthquakeService extends Service {
     private static long myLong = 1l;
     private DatabaseReference referenceEarthquakes;
 
-
-//    public EarthquakeService() {
-//        super("EarthquakeService");
-//    }
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -72,17 +67,6 @@ public class EarthquakeService extends Service {
         referenceEarthquakes.addValueEventListener(valueEventListenerEarthquake);
     }
 
-//    @Override
-//    public void setIntentRedelivery(boolean enabled) {
-//        super.setIntentRedelivery(enabled);
-//    }
-//
-//    @Override
-//    public void onStart(@Nullable Intent intent, int startId) {
-//        super.onStart(intent, startId);
-//    }
-
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
@@ -108,12 +92,6 @@ public class EarthquakeService extends Service {
         });
 
         thdsds.start();
-//        try {
-//            thdsds.sleep(11000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
         return START_STICKY;
     }
 
@@ -153,9 +131,6 @@ public class EarthquakeService extends Service {
 
     private long getFirebaseTimeUsingCurl(final String urlStr) {
 
-//        Thread separateThread = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
         Request request = new Request.Builder().url(urlStr).build(); //Request builder is used to get JSON url
 
         try {
@@ -168,10 +143,6 @@ public class EarthquakeService extends Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
-//            }
-//        });
-//        separateThread.start();
-
         return myLong;
 
     }

@@ -130,13 +130,13 @@ public class ContactFragment extends Fragment implements
                     stringImage));
         }
 
-        boolean isFavourite = !stringToggle.equals("false");
+        boolean isEmergency = !stringToggle.equals("false");
         if (favToogleCache.containsKey(row.getInt("_id"))) {
-            isFavourite = favToogleCache.get(row.getInt("_id"));
+            isEmergency = favToogleCache.get(row.getInt("_id"));
         } else {
-            favToogleCache.put(row.getInt("_id"), isFavourite);
+            favToogleCache.put(row.getInt("_id"), isEmergency);
         }
-        toggleFavourite.setChecked(isFavourite);
+        toggleFavourite.setPressed(isEmergency);
         toggleFavourite.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

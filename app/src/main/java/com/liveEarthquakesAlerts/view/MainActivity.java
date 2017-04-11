@@ -1,22 +1,13 @@
 package com.liveEarthquakesAlerts.view;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.location.Location;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,11 +38,8 @@ import com.liveEarthquakesAlerts.model.LocationPOJO;
 import com.liveEarthquakesAlerts.model.database.EarthQuakes;
 import com.liveEarthquakesAlerts.model.database.LastEarthquakeDate;
 import com.liveEarthquakesAlerts.model.database.LastEarthquakeDateRisky;
-import com.liveEarthquakesAlerts.model.database.RiskyEarthquakes;
-import com.odoo.FavoriteNumberBean;
 import com.squareup.otto.Subscribe;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -206,13 +194,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         App.bus.register(this);
 
-//        pd = new ProgressDialog(MainActivity.this); //show progressbar
-//        pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-//        pd.setTitle(getString(R.string.PleaseWait));
-//        pd.setMessage(getString(R.string.DatasLoading));
-//        pd.setCancelable(true);
-//        pd.setIndeterminate(true);
-//        pd.show();
+        pd = new ProgressDialog(MainActivity.this); //show progressbar
+        pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        pd.setTitle(getString(R.string.PleaseWait));
+        pd.setMessage(getString(R.string.DatasLoading));
+        pd.setCancelable(true);
+        pd.setIndeterminate(true);
+        pd.show();
     }
 
     @Override
@@ -252,25 +240,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         } else {
 
 
-            RiskyEarthquakes riskyEarthquakes = new RiskyEarthquakes();
-            List<RiskyEarthquakes> allRiskyEarthquakes = riskyEarthquakes.GetAllData();
-
-//          update the RiskyEarthquakes
-            for (RiskyEarthquakes r : allRiskyEarthquakes) {
-                if (!CheckRiskEarthquakes.checkRisky(r)) {
-                    r.DeleteRow(r.getDateMilis());
-                }
-            }
-
-            for (RiskyEarthquakes r : allRiskyEarthquakes) {
-                while (CheckRiskEarthquakes.checkRisky(r)) {
-                    //Notify user
-                    notificationHandler();
-                    //Notify emergency only one time, then pop the "I am Ok" button to click and push messages "I am ok"
-                    sendMsgToEmergencyContacts();
-                }
-            }
-
 
 //update the adapter
             List<EarthQuakes> EarthQuakeList;
@@ -299,11 +268,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //stop the progress bar
 
-//        if (pd != null && pd.isShowing()) {
-//            Log.i("Inside pd", "pd is running");
-//            pd.dismiss();
-//            pd = null;
-//        }
+        if (pd != null && pd.isShowing()) {
+            Log.i("Inside pd", "pd is running");
+            pd.dismiss();
+            pd = null;
+        }
     }
 
     @Override
@@ -462,82 +431,4 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onDestroy();
     }
 
-
-    public void notificationHandler() {
-        showNotification();
-    }
-
-    public void showNotification() {
-        List<RiskyEarthquakes> newEarthquakes = new RiskyEarthquakes().newEarthquakes();
-
-        if (newEarthquakes.size() > 0) { //if there are earthquakes
-
-            if (AppSettings.getInstance().isNotifications()) {
-                createNotification(getString(R.string.EarthquakesDetect), "" + newEarthquakes.get(0).getMagnitude() + "  |  " + newEarthquakes.get(0).getLocationName());
-                messageEarthquake = "Earthquake Hit !!" + newEarthquakes.get(0).getMagnitude() + "  |  " + newEarthquakes.get(0).getLocationName();
-
-            }
-
-
-            LastEarthquakeDate led = new LastEarthquakeDate();
-            led.setDateMilis(new EarthQuakes().GetLastEarthQuakeDate());
-            led.Insert();
-        }
-    }
-
-    public void sendMsgToEmergencyContacts() {
-        FavoriteNumberBean favoriteNumberBean = new FavoriteNumberBean(false);
-        ArrayList<String> mobileList = favoriteNumberBean.getMobileNumber();
-        SmsManager smsManager = SmsManager.getDefault();
-        //send every emergency contacts the messages
-        for (String phone : mobileList) {
-            smsManager.sendTextMessage(phone, null, messageEarthquake, null, null);
-        }
-        //now create "I am Ok button", tap it to send "I am Ok" messages to every emergency contacts
-
-        //create a floating button
-        FloatingActionButton floatingActionButton = new FloatingActionButton(getApplicationContext());
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FavoriteNumberBean favoriteNumberBean = new FavoriteNumberBean(false);
-                ArrayList<String> mobileList = favoriteNumberBean.getMobileNumber();
-                SmsManager smsManager = SmsManager.getDefault();
-                //send every emergency contacts the messages
-                for (String phone : mobileList) {
-                    smsManager.sendTextMessage(phone, null, "I am Ok!", null, null);
-                }
-            }
-        });
-    }
-
-    public void createNotification(String strContentTitle, String strContentText) {
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext()) //
-                .setSmallIcon(R.drawable.icon1) //
-                .setContentTitle(strContentTitle) //
-                .setContentText(strContentText);
-
-        Intent resultIntent = new Intent(this, MainActivity.class);
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(MainActivity.class);
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        builder.setContentIntent(resultPendingIntent);
-        builder.setAutoCancel(true);
-        builder.setLights(Color.BLUE, 500, 500);
-
-        if (AppSettings.getInstance().isVibration()) {
-            long[] pattern = {500, 500};
-            builder.setVibrate(pattern);
-        }
-        if (AppSettings.getInstance().isSound()) {
-            Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            builder.setSound(alarmSound);
-        }
-
-        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(0, builder.build());
-    }
 }
