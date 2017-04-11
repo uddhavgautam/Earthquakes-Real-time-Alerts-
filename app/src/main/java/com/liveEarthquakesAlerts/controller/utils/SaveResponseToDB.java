@@ -70,9 +70,9 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
             }.getType();
 
 
-            new Thread(new Runnable() { //should do network operation using separate thread; can't do from main thread
-                @Override
-                public void run() {
+//            new Thread(new Runnable() { //should do network operation using separate thread; can't do from main thread
+//                @Override
+//                public void run() {
                     try {
                         jsonOriginal = getJson(url);
 
@@ -88,14 +88,10 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
                             return;
                         }
 
-                        Log.i("items", items.toString());
 //                        update only if there is new data. This condition should not be for the first time
                         if (!SaveResponseToDB.isInitialized) { //first time
-                            Log.i(TAG, "SaveResponseToDB isInitialized false!");
                             doUpdate(items, databaseReference);
                         } else {
-                            MetadataUSGS metadataUSGS = new MetadataUSGS();
-                            Log.i(TAG, "SaveResponseToDB isInitialized true!");
                             Long newDataTime = items.getMetadata().getGenerated();
                             Long firebaseTime = getFirebaseTimeUsingCurl("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes/metadata/generated.json?print=pretty");
 
@@ -115,8 +111,8 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }
-            }).start();
+//                }
+//            }).start();
 
 
         } catch (Exception e) {
@@ -129,14 +125,14 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
         databaseReference.child("realTimeEarthquakes").setValue(items); //upload jsonOriginal on new "realTimeEarthquakes" node
         String jsonString = "{  \n" +
                 "      \"metaInfo\": {\n" +
-                "        \"count\": \"serversCount\",\n" +
-                "        \"onlineLastTime\": \"timeMilis\",\n" +
-                "        \"needToBeServer\": \"false\"\n" +
+                "        \"count\": \'serversCount\',\n" +
+                "        \"onlineLastTime\": 1491873255092, \n" +
+                "        \"needToBeServer\": \'false\'\n" +
                 "      },\n" +
                 "      \"servers\": [\n" +
                 "        {\n" +
                 "          \"id\": \"myid\",\n" +
-                "          \"lastTime\": \"timeMilis\"\n" +
+                "          \"lastTime\": 1491873255092\n" +
                 "        }\n" +
                 "      ]\n" +
                 "   }\n";
@@ -145,7 +141,7 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
         }.getType());
 
         databaseReference.child("serverTrack").setValue(jsonMap); //upload jsonOriginal on new "realTimeEarthquakes" node
-        update_onlineLastTimeFirebase(databaseReference);
+//        update_onlineLastTimeFirebase(databaseReference);
     }
 
     private static Long getFirebaseTimeUsingCurl(String urlStr) {
@@ -177,8 +173,6 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
                     intent.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("isInitializedAlreaqdy", SaveResponseToDB.isInitialized);
                     Log.i(TAG, "loctracking service FROM LONG RUN");
                     MainActivity.mainApplicationContext.sendBroadcast(intent);
-
-
                     Log.i(TAG, "Firebase onlineLastTime updated!");
                 } else {
                     unSuccessfulAttempts++;
@@ -201,9 +195,9 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
 
         try {
             Response response = new OkHttpClient().newCall(request).execute(); //OkHttpClient is HTTP client to request
-            String str = response.body().string(); //because it prints with newline character with it
-            myStr = str;
-            Log.i("WholeJSON", str);
+            String str[] = response.body().string().split("\\n"); //because it prints with newline character with it
+            myStr = str[0];
+            Log.i("firstLine", myStr);
         } catch (IOException e) {
             e.printStackTrace();
         }

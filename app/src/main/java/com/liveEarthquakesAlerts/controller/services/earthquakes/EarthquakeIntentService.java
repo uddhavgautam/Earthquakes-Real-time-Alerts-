@@ -1,8 +1,9 @@
 package com.liveEarthquakesAlerts.controller.services.earthquakes;
 
 
-import android.app.IntentService;
+import android.app.Service;
 import android.content.Intent;
+import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -27,17 +28,17 @@ import okhttp3.Response;
 /**
  * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
-public class EarthquakeIntentService extends IntentService {
+public class EarthquakeIntentService extends Service {
 
     private static final String TAG = "EarthquakeIntentService";
     private static long firebaseTime;
+    private static long myLong = 1l;
     private DatabaseReference referenceEarthquakes;
-    private DatabaseReference referenceUpdateTime;
 
 
-    public EarthquakeIntentService() {
-        super("EarthquakeIntentService");
-    }
+//    public EarthquakeIntentService() {
+//        super("EarthquakeIntentService");
+//    }
 
     @Override
     public void onCreate() {
@@ -71,62 +72,106 @@ public class EarthquakeIntentService extends IntentService {
         referenceEarthquakes.addValueEventListener(valueEventListenerEarthquake);
     }
 
-    @Override
-    public void setIntentRedelivery(boolean enabled) {
-        super.setIntentRedelivery(enabled);
-    }
+//    @Override
+//    public void setIntentRedelivery(boolean enabled) {
+//        super.setIntentRedelivery(enabled);
+//    }
+//
+//    @Override
+//    public void onStart(@Nullable Intent intent, int startId) {
+//        super.onStart(intent, startId);
+//    }
+
 
     @Override
-    public void onStart(@Nullable Intent intent, int startId) {
-        super.onStart(intent, startId);
-    }
-
-    @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
-
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
         referenceEarthquakes = FirebaseDatabase.getInstance().getReference().getRoot().child("realTimeEarthquakes");
-        referenceUpdateTime = FirebaseDatabase.getInstance().getReference().getRoot().child("serverTrack").child("metaInfo").child("onlineLastTime");
-
         fetchFromFirebase(); //if data changed then it fetches the earthquakes automatically
 
-
-        while (true) {
-            Thread ttttfs = new Thread(new Runnable() {
-                @Override
-                public void run() {
+        Thread thdsds = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
                     firebaseTime = getFirebaseTimeUsingCurl("https://earthquakesenotifications.firebaseio.com/serverTrack/metaInfo/onlineLastTime.json?print=pretty");
                     if (((new Date().getTime()) - firebaseTime) > 11000) {
                         Log.i("Periodic", " updateasdf!");
                         SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGS(), FirebaseDatabase.getInstance().getReference().getRoot());
+                        try {
+                            Thread.currentThread().sleep(11000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
-            });
-            ttttfs.start();
-            try {
-                ttttfs.sleep(11000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
+        });
 
-        }
+        thdsds.start();
+//        try {
+//            thdsds.sleep(11000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
-//        Looper.loop(); //keep current thread alive
-
-// curl 'https://earthquakesenotifications.firebaseio.com/serverTrack/metaInfo/onlineLastTime.json?print=pretty'
-
+        return START_STICKY;
     }
 
-    private Long getFirebaseTimeUsingCurl(String urlStr) {
-        Long myLong = 1l;
+//    @Override
+//    protected void onHandleIntent(@Nullable Intent intent) {
+//        referenceEarthquakes = FirebaseDatabase.getInstance().getReference().getRoot().child("realTimeEarthquakes");
+//        referenceUpdateTime = FirebaseDatabase.getInstance().getReference().getRoot().child("serverTrack").child("metaInfo").child("onlineLastTime");
+//
+//        fetchFromFirebase(); //if data changed then it fetches the earthquakes automatically
+//
+//
+//        while(true) {
+//            Thread ttttfs = new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    firebaseTime = getFirebaseTimeUsingCurl("https://earthquakesenotifications.firebaseio.com/serverTrack/metaInfo/onlineLastTime.json?print=pretty");
+//                    if (((new Date().getTime()) - firebaseTime) > 11000) {
+//                        Log.i("Periodic", " updateasdf!");
+//                        SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGS(), FirebaseDatabase.getInstance().getReference().getRoot());
+//                    }
+//                }
+//            });
+//            ttttfs.start();
+//            try {
+//                ttttfs.sleep(11000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//
+//        }
+//
+////        Looper.loop(); //keep current thread alive
+//
+//// curl 'https://earthquakesenotifications.firebaseio.com/serverTrack/metaInfo/onlineLastTime.json?print=pretty'
+//
+//    }
+
+    private long getFirebaseTimeUsingCurl(final String urlStr) {
+
+//        Thread separateThread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
         Request request = new Request.Builder().url(urlStr).build(); //Request builder is used to get JSON url
 
         try {
             Response response = new OkHttpClient().newCall(request).execute(); //OkHttpClient is HTTP client to request
             String[] str = response.body().string().split("\\n"); //because it prints with newline character with it
+            Log.i("myLong", str[0]);
+
             myLong = Long.parseLong(str[0]);
+            Log.i("myLong", myLong + "");
         } catch (IOException e) {
             e.printStackTrace();
         }
+//            }
+//        });
+//        separateThread.start();
+
         return myLong;
 
     }
@@ -135,6 +180,12 @@ public class EarthquakeIntentService extends IntentService {
     public void onDestroy() {
         App.bus.unregister(this);
         Log.i(TAG, "EarthquakeIntentService destroyed!");
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
 }

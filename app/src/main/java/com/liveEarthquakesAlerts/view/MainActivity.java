@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         list.setOnItemClickListener(this);
 
 
-        initializeFirebaseRealtimeDB(); //completed
+
 
     }
 
@@ -142,10 +142,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Thread newThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                //if there is data. Don't do null checking using "==" operator.
+                //if there is data. Don't do null checking using "==" operator. This understanding is wrong
+
+                //Note: Firebase writes "null" string for null
+
+                //below myVarData can throw null\n. Please remember this
                 String myVarData = SaveResponseToDB.getFirebaseWholeData("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes.json?print=pretty");
-                Log.i("myVarData", "hdfkdfj" + myVarData);
-                if ((!myVarData.equals(null)) && (myVarData != "")) { //realtime db already exists
+                Log.i("myVarData", "\"" + myVarData + "\"" + " hello gautam! " + myVarData.equals(null));
+                if ((!myVarData.equals("null"))) { //realtime db already exists
                     Log.i("else", "inside elsewer, realtime DB already exists");
 //                    create Firebase Realtime DB jsonOriginal structure and upload earthquake JSON
                     SaveResponseToDB.isInitialized = true;
@@ -158,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     Log.i("else", "no real time db");
                     SaveResponseToDB.isInitialized = false;//initialized but not properly. Therefore isInitialized = false
                     SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
-                    clientHelper.updateFirebase(CreateRequestUrl.URL_USGS(), databaseReference);
+                    SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGS(), databaseReference);
                 }
 
             }
@@ -197,6 +201,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("SaveResponseToDB.isInitialized.Uddhav");
         registerReceiver(incomingReceiver, intentFilter);
+
+
+        initializeFirebaseRealtimeDB(); //completed
 
 
         App.bus.register(this);
