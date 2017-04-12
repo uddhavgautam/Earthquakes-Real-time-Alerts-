@@ -56,7 +56,6 @@ public class LocTrackService extends Service
         GoogleApiClient.OnConnectionFailedListener {
 
     public static final String TAG = "LocTrackService";
-    public static Handler mHandler;
     public static boolean isLocationUpdated = false;
     public int count = 0;
     public LocationRequest mLocationRequest;
@@ -67,7 +66,14 @@ public class LocTrackService extends Service
     private MyOwnCustomLog myOwnCustomLog = new MyOwnCustomLog();
     private String messageEarthquake;
     private Handler handler;
+    private Context context1;
 
+    public LocTrackService(Context mainActivityContext) {
+        this.context1 = mainActivityContext;
+    }
+
+    public LocTrackService() {
+    }
 
     @Override
     public void onCreate() {
@@ -241,8 +247,14 @@ public class LocTrackService extends Service
         }
     }
 
-    public void notificationHandler() {
-        showNotification();
+    private void notificationHandler() {
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                showNotification();
+            }
+        });
     }
 
     public void showNotification() {
@@ -265,31 +277,36 @@ public class LocTrackService extends Service
     private void sendMsgToEmergencyContacts() {
         FavoriteNumberBean favoriteNumberBean = new FavoriteNumberBean(false);
         ArrayList<String> mobileList = favoriteNumberBean.getMobileNumber();
-        SmsManager smsManager = SmsManager.getDefault();
+        final SmsManager[] smsManager = {SmsManager.getDefault()};
 //send every emergency contacts the messages
         for (String phone : mobileList) {
-            smsManager.sendTextMessage(phone, null, messageEarthquake, null, null);
+            smsManager[0].sendTextMessage(phone, null, messageEarthquake, null, null);
         }
 //now create "I am Ok button", tap it to send "I am Ok" messages to every emergency contacts
         handler.post(new Runnable() {
             @Override
             public void run() {
 //create a floating button
-                FloatingActionButton floatingActionButton = new FloatingActionButton(getApplicationContext());
+                FloatingActionButton floatingActionButton = getFAB();
                 floatingActionButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         FavoriteNumberBean favoriteNumberBean = new FavoriteNumberBean(false);
                         ArrayList<String> mobileList = favoriteNumberBean.getMobileNumber();
-                        SmsManager smsManager = SmsManager.getDefault();
+                        smsManager[0] = SmsManager.getDefault();
 //send every emergency contacts the messages
                         for (String phone : mobileList) {
-                            smsManager.sendTextMessage(phone, null, "I am Ok!", null, null);
+                            smsManager[0].sendTextMessage(phone, null, "I am Ok!", null, null);
                         }
                     }
                 });
             }
         });
+    }
+
+    private FloatingActionButton getFAB() {
+        FloatingActionButton fab = new FloatingActionButton(context1);
+        return fab;
     }
 
 

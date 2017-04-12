@@ -47,11 +47,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener, OnScrollListener {
 
     public static String bannerText;
-    public static Context mainApplicationContext;
     public static Intent locInitServiceIntent;
     private static IncomingReceiver incomingReceiver;
     private final String TAG = "MainActivity";
-    public String messageEarthquake;
     private ProgressDialog pd;
     private ListView list;
     private int currentScrollState, currentFirstVisibleItem, currentVisibleItemCount, currentTotalItemCount;
@@ -64,7 +62,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mainApplicationContext = getApplicationContext();
+
+        SaveResponseToDB saveResponseToDB = new SaveResponseToDB(this); //pass the context. Don't use static, it will leak the memory
+        LocTrackService locTrackService = new LocTrackService(this); //pass the context
 
         //I did broadcast receiver registration for my intent filter in main thread
 

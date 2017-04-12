@@ -1,5 +1,6 @@
 package com.liveEarthquakesAlerts.controller.utils;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -20,7 +21,6 @@ import com.liveEarthquakesAlerts.model.sources.pOJOFolderUSGS.insidePOJOFolderUS
 import com.liveEarthquakesAlerts.model.sources.pOJOFolderUSGS.insidePOJOFolderUSGS.featuresFolderUSGS.insideFeaturesUSGS.GeometryUSGS;
 import com.liveEarthquakesAlerts.model.sources.pOJOFolderUSGS.insidePOJOFolderUSGS.featuresFolderUSGS.insideFeaturesUSGS.PropertiesUSGS;
 import com.liveEarthquakesAlerts.model.sources.pOJOFolderUSGS.insidePOJOFolderUSGS.metadataFolderUSGS.MetadataUSGS;
-import com.liveEarthquakesAlerts.view.MainActivity;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -49,12 +49,17 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
     private static int unSuccessfulAttempts = 0;
     private static OutgoingReceiver outgoingReceiver;
     private static POJOUSGS<String, MetadataUSGS, FeaturesUSGS<PropertiesUSGS, GeometryUSGS>, Float> items;
+    private static Context context;
     private Integer sig, decimalPlace = 1;
     private long time;
     private Float longitude, latitude, depth, magnitude;
 
     public SaveResponseToDB() {
         DatabaseHelper.getDbHelper().clearDatabase();
+    }
+
+    public SaveResponseToDB(Context myContext) {
+        context = myContext;
     }
 
     public static String getJson(String reqUrl) throws Exception {
@@ -164,7 +169,7 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
                     Intent intent = new Intent();
                     intent.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("isInitializedAlreaqdy", SaveResponseToDB.isInitialized);
                     Log.i(TAG, "loctracking service FROM LONG RUN");
-                    MainActivity.mainApplicationContext.sendBroadcast(intent);
+                    context.sendBroadcast(intent);
                     Log.i(TAG, "Firebase onlineLastTime updated!");
                 } else {
                     unSuccessfulAttempts++;
