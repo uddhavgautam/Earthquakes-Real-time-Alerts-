@@ -3,7 +3,7 @@
 <resources>
 
     <string name="app_name">EarthquakesNotificationTool</string>
-    <string name="title_activity">EarthQuakes Alerts</string>
+    <string name="title_activity">Earthquakes</string>
     <string name="EarthquakesDetect">Earthquake Detected!</string>
     <string name="NoConnection">Internet connection was not found!</string>
     <string name="MapCanNotBeDisplayed">Map can not be displayed</string>
@@ -42,8 +42,49 @@
     <string name="please_wait">Please wait...</string>
     <string name="login_in_progress">Login in progress</string>
     <string name="import_contact_from_device">Import contacts from device</string>
-    <string name="DatasLoading">\"Loading ...\"</string>
-    <string name="PleaseWait">Please wait ....</string>
+    <string name="title_activity_help">Help?</string>
+
+    <string name="large_text_help">
+
+\n\n
+
+
+About\n
+This is a tool which provides you real-time earthquakes alerts. It has the features which can send the automated text messages for your emergency contacts too. After messages get sent to emergency contacts, there comes floating action button, which on tap responses “I am Ok” message to your emergency contacts.
+\n\n\n\n\n
+
+Procedures\n
+
+Main Screen shows real-time earthquakes based on your settings.
+
+\n\nOn each click of row, you see in the bottom banner what is the distance between you and that particular earthquake?
+
+\n\nLong click displays google maps.
+
+\n\nRight top-most is the menu for: Settings, Help, and About.
+
+\n\nChoose your settings from Settings Screen.
+
+\n\nIf you choose “Emergency Contacts” then “Red call icon” on just left of the menu appears. This icon we say as “e-contact” icon.
+
+\n\nE-contact click gives you the option to choose your emergency contacts. These emergency contacts will get sms notification when you get hit by risky earthquakes.
+
+
+
+\n \n \n
+
+
+
+    </string>
+    <string name="title_activity_about">AboutActivity</string>
+    <string name="large_textt">
+        "About Developer\n\n"
+        "Uddhav Gautam\n"
+        "upgautam@ualr.edu\n"
+        "infofuniversities@gmail.com\n"
+        \n\n"
+    </string>
+    <string name="action_settings">Settings</string>
 
 
 </resources>

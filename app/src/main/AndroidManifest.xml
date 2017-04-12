@@ -145,26 +145,45 @@
             android:enabled="true"
             android:exported="false" />
 
-        <!--<receiver-->
-        <!--android:name=".controller.utils.broadcastReceiver.IncomingReceiver"-->
-        <!--android:enabled="true"-->
-        <!--android:exported="true">-->
-        <!--&lt;!&ndash;<intent-filter>&ndash;&gt;-->
-        <!--&lt;!&ndash;<action android:name="SaveResponseToDB.isInitialized.Uddhav" />&ndash;&gt;-->
-        <!--&lt;!&ndash;</intent-filter>&ndash;&gt;-->
-        <!--</receiver>-->
-
-        <!--<receiver-->
-        <!--android:name=".controller.utils.broadcastReceiver.OutgoingReceiver"-->
-        <!--android:enabled="true"-->
-        <!--android:exported="true">-->
-        <!--&lt;!&ndash;<intent-filter>&ndash;&gt;-->
-        <!--&lt;!&ndash;<action android:name="SaveResponseToDB.isInitialized.Uddhav" />&ndash;&gt;-->
-        <!--&lt;!&ndash;</intent-filter>&ndash;&gt;-->
-
-        <!--</receiver>-->
+        <!-- <receiver -->
+        <!-- android:name=".controller.utils.broadcastReceiver.IncomingReceiver" -->
+        <!-- android:enabled="true" -->
+        <!-- android:exported="true"> -->
+        <!-- &lt;!&ndash;<intent-filter>&ndash;&gt; -->
+        <!-- &lt;!&ndash;<action android:name="SaveResponseToDB.isInitialized.Uddhav" />&ndash;&gt; -->
+        <!-- &lt;!&ndash;</intent-filter>&ndash;&gt; -->
+        <!-- </receiver> -->
 
 
+        <!-- <receiver -->
+        <!-- android:name=".controller.utils.broadcastReceiver.OutgoingReceiver" -->
+        <!-- android:enabled="true" -->
+        <!-- android:exported="true"> -->
+        <!-- &lt;!&ndash;<intent-filter>&ndash;&gt; -->
+        <!-- &lt;!&ndash;<action android:name="SaveResponseToDB.isInitialized.Uddhav" />&ndash;&gt; -->
+        <!-- &lt;!&ndash;</intent-filter>&ndash;&gt; -->
+
+
+        <!-- </receiver> -->
+
+        <activity
+            android:name=".view.HelpActivity"
+            android:label="@string/title_activity_help"
+            android:parentActivityName=".view.MainActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.liveEarthquakesAlerts.view.MainActivity" />
+        </activity>
+        <activity
+            android:name=".view.AboutActivity"
+            android:label="@string/title_activity_about"
+            android:parentActivityName=".view.MainActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.liveEarthquakesAlerts.view.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

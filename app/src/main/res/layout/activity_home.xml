@@ -5,31 +5,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+
     tools:context="com.odoo.HomeActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
+
         android:layout_height="wrap_content"
         android:background="@color/statusbar">
 
-        <!--<android.support.v7.widget.Toolbar-->
-        <!--android:id="@+id/toolbar"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="?attr/actionBarSize"-->
-        <!--android:elevation="4dp"-->
-        <!--app:titleTextColor="@color/android_white"-->
-        <!--android:background="@color/statusbar"-->
-        <!--app:titleTextAppearance="@android:style/TextAppearance.DeviceDefault.DialogWindowTitle" />-->
-
         <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+            android:id="@+id/toolbarHomeOdooActivity"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/statusbar"
-            android:theme="@style/AppTheme1"
-            android:titleTextColor="@color/android_white">
+            android:elevation="4dp"
+            app:titleTextAppearance="@android:style/TextAppearance.DeviceDefault.DialogWindowTitle"
+            app:titleTextColor="@color/android_white" />
 
-        </android.support.v7.widget.Toolbar>
+        <!--<android.support.v7.widget.Toolbar-->
+
+        <!--android:id="@+id/toolbarHomeOdooActivity"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="?attr/actionBarSize"-->
+        <!--android:background="@color/statusbar"-->
+        <!--android:theme="@style/AppTheme1"-->
+        <!--android:titleTextColor="@color/android_white">-->
+
+        <!--</android.support.v7.widget.Toolbar>-->
 
 
         <android.support.v7.widget.SearchView
@@ -45,6 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@color/statusbar"
             android:theme="@style/AppTheme1"
             app:tabGravity="fill"
             app:tabMaxWidth="0dp"
@@ -60,7 +64,6 @@
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/list_selector"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <android.support.design.widget.FloatingActionButton

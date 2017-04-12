@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/statusbar"
     android:fitsSystemWindows="true"
     tools:context="com.odoo.HomeActivity">
 
@@ -22,7 +23,7 @@
         <!--app:titleTextAppearance="@android:style/TextAppearance.DeviceDefault.DialogWindowTitle" />-->
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+            android:id="@+id/toolbarHomeOdooActivity"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/statusbar"
@@ -45,6 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@color/statusbar"
             android:theme="@style/AppTheme1"
             app:tabGravity="fill"
             app:tabMaxWidth="0dp"

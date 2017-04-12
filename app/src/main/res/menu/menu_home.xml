@@ -2,21 +2,39 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.odoo.HomeActivity">
-    <!--<item-->
-    <!--android:id="@+id/menu_sync"-->
-    <!--android:icon="@drawable/ic_sync"-->
-    <!--android:paddingRight="0dp"-->
-    <!--android:layout_marginRight="0dp"-->
-    <!--android:title="@string/menu_sync_label"-->
-    <!--app:showAsAction="always" />-->
 
     <item
-        android:id="@+id/menu_remove_emergency_contact"
-        android:title="@string/remove_fav_contact"
-        app:showAsAction="never" />
+        android:id="@+id/e_logo"
+        android:enabled="true"
+        android:icon="@drawable/threedotsicon"
+        android:orderInCategory="100"
+        android:title="**********"
+        android:visible="true"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction,HardcodedText">
 
-    <item
-        android:id="@+id/menu_import_contact"
-        android:title="@string/import_contact_from_device"
-        app:showAsAction="never" />
+        <menu>
+            <item
+                android:id="@+id/menu_remove_emergency_contact"
+                android:actionLayout="@color/statusbar"
+                android:checkable="false"
+                android:checked="false"
+                android:enabled="true"
+                android:icon="@drawable/user_group_users_delete_minus"
+                android:title="@string/remove_fav_contact"
+                android:visible="true"
+                app:showAsAction="always" />
+
+            <item
+                android:id="@+id/menu_import_contact"
+                android:actionLayout="@color/statusbar"
+                android:enabled="true"
+                android:icon="@drawable/user_group_users_add_128"
+                android:title="@string/import_contact_from_device"
+                android:visible="true"
+                app:showAsAction="always" />
+        </menu>
+    </item>
+
+
 </menu>

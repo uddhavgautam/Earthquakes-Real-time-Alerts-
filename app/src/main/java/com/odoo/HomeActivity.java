@@ -56,7 +56,7 @@ public class HomeActivity extends AppCompatActivity implements TabLayout.OnTabSe
         setContentView(R.layout.activity_home);
 
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarHomeOdooActivity);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //
 ////        set the logo icon
         mToolbar.setLogo(R.drawable.icon1);
+        getSupportActionBar().setSubtitle("Real-time Alerts!");
 
         AppSettings.setDefaultSettings(); //SingleFragmentActivity -- AppSettings -- other classes
 
@@ -192,13 +193,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         App.bus.register(this);
 
-        pd = new ProgressDialog(MainActivity.this); //show progressbar
-        pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        pd.setTitle(getString(R.string.PleaseWait));
-        pd.setMessage(getString(R.string.DatasLoading));
-        pd.setCancelable(true);
-        pd.setIndeterminate(true);
-        pd.show();
+//        pd = new ProgressDialog(MainActivity.this); //show progressbar
+//        pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+//        pd.setTitle(getString(R.string.PleaseWait));
+//        pd.setMessage(getString(R.string.DatasLoading));
+//        pd.setCancelable(true);
+//        pd.setIndeterminate(true);
+//        pd.show();
     }
 
     @Override
@@ -264,19 +265,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         }
 
-        //stop the progress bar
+//        stop the progress bar
 
-        if (pd != null && pd.isShowing()) {
-            Log.i("Inside pd", "pd is running");
-            pd.dismiss();
-            pd = null;
-        }
+//        if (pd != null && pd.isShowing()) {
+//            Log.i("Inside pd", "pd is running");
+//            pd.dismiss();
+//            pd = null;
+//        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        getMenuInflater().inflate(R.menu.activity_main, menu);
+        getMenuInflater().inflate(R.menu.activity_main_menu, menu);
         return true;
     }
 
@@ -296,20 +297,37 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        if (item.getItemId() == R.id.action_main) {
-
-            Intent i1 = new Intent(MainActivity.this, SettingsActivity.class); //It is actually communicating with SettingsActivity's fragment
-            //explicit intent to start SingleFragmentActivity
-            startActivityForResult(i1, 7777); //Update Menu from this activity. //(Intent, requestCode)
-
-            return true;
-        }
-
         if (item.getItemId() == R.id.e_contact) {
 
             Intent i2 = new Intent(MainActivity.this, com.odoo.HomeActivity.class); //explicit intent to start SingleFragmentActivity
             startActivity(i2);
+            return true;
+        }
+
+        if (item.getItemId() == R.id.action_main) {
+
+            Intent i3 = new Intent(MainActivity.this, SettingsActivity.class); //It is actually communicating with SettingsActivity's fragment
+            //explicit intent to start SingleFragmentActivity
+            startActivity(i3); //Update Menu from this activity. //(Intent, requestCode)
+
+            return true;
+        }
+
+        if (item.getItemId() == R.id.action_help) {
+
+            Intent i4 = new Intent(MainActivity.this, HelpActivity.class); //It is actually communicating with SettingsActivity's fragment
+            //explicit intent to start SingleFragmentActivity
+            startActivity(i4);//Update Menu from this activity. //(Intent, requestCode)
+
+            return true;
+        }
+
+        if (item.getItemId() == R.id.action_about) {
+
+            Intent i5 = new Intent(MainActivity.this, AboutActivity.class); //It is actually communicating with SettingsActivity's fragment
+            //explicit intent to start SingleFragmentActivity
+            startActivity(i5); //Update Menu from this activity. //(Intent, requestCode)
+
             return true;
         }
 
