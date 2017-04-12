@@ -77,7 +77,7 @@ public class LocTrackService extends Service
     }
 
     public void createLocationRequest() { //in main thread
-
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(10000); //10 seconds
         mLocationRequest.setSmallestDisplacement(500); //500 meters changed
@@ -115,6 +115,7 @@ public class LocTrackService extends Service
 
 
                         } catch (IOException e) {
+                            Log.i("GoogleAPIClient", " not connected yet sir!");
                             e.printStackTrace();
                         }
                     }

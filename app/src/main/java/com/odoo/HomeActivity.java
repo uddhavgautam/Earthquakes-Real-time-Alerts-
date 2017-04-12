@@ -46,6 +46,10 @@ public class HomeActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private SearchView searchview;
     private ResPartner resPartner;
 
+    public HomeActivity() {
+        super();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -221,6 +225,20 @@ public class HomeActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
     public static class PlaceholderFragment extends Fragment {
         private static final String ARG_SECTION_NUMBER = "section_number";

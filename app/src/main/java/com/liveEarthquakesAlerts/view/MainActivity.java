@@ -33,7 +33,6 @@ import com.liveEarthquakesAlerts.controller.utils.MyOwnCustomLog;
 import com.liveEarthquakesAlerts.controller.utils.OnLineTracker;
 import com.liveEarthquakesAlerts.controller.utils.SaveResponseToDB;
 import com.liveEarthquakesAlerts.controller.utils.broadcastReceiver.IncomingReceiver;
-import com.liveEarthquakesAlerts.controller.utils.broadcastReceiver.OutgoingReceiver;
 import com.liveEarthquakesAlerts.model.LocationPOJO;
 import com.liveEarthquakesAlerts.model.database.EarthQuakes;
 import com.liveEarthquakesAlerts.model.database.LastEarthquakeDate;
@@ -50,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static String bannerText;
     public static Context mainApplicationContext;
     public static Intent locInitServiceIntent;
+    private static IncomingReceiver incomingReceiver;
     private final String TAG = "MainActivity";
     public String messageEarthquake;
     private ProgressDialog pd;
@@ -59,14 +59,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private TextView tvEmptyMessage;
     private TextView tvBanner;
     private boolean isConnectToInternet = true;
-    private IncomingReceiver incomingReceiver;
-    private OutgoingReceiver outgoingReceiver;
     private MyOwnCustomLog myOwnCustomLog = new MyOwnCustomLog();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mainApplicationContext = getApplicationContext();
         super.onCreate(savedInstanceState);
+        mainApplicationContext = getApplicationContext();
 
         //I did broadcast receiver registration for my intent filter in main thread
 
@@ -165,6 +163,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String simpleName = this.getClass().getSimpleName();
         myOwnCustomLog.addLog(simpleName, Thread.currentThread().getStackTrace()[2].getMethodName().toString(), stackTraces);
 
+
         //make sure firebase realtime DB initialized completed. Why? Because as LocTrackService gets the location
         //I start fetching from firebase. There I create reference. If I don't have already initialized, then it throws null pointer
         //exception on those references
@@ -187,7 +186,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("SaveResponseToDB.isInitialized.Uddhav");
         registerReceiver(incomingReceiver, intentFilter);
-
 
         initializeFirebaseRealtimeDB(); //completed
 

@@ -3,6 +3,7 @@ package com.odoo;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -46,11 +47,11 @@ public class ContactFragment extends Fragment implements
         AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
     private static final int REQUEST_CODE_ASK_PERMISSIONS_CALL_CONTACT = 11;
+    private static boolean isEmergency;
     private ResPartner resPartner;
     private OListAdapter oListAdapter;
     private ListView contactList;
     private RecentContact recentContact;
-
     private HashMap<Integer, Boolean> favToogleCache = new HashMap<>();
 
     public ContactFragment() {
@@ -130,14 +131,17 @@ public class ContactFragment extends Fragment implements
                     stringImage));
         }
 
-        boolean isEmergency = !stringToggle.equals("false");
+        isEmergency = !stringToggle.equals("false");
         if (favToogleCache.containsKey(row.getInt("_id"))) {
             isEmergency = favToogleCache.get(row.getInt("_id"));
+
         } else {
             favToogleCache.put(row.getInt("_id"), isEmergency);
+            Log.i("Emergency", isEmergency + "");
+
         }
-        toggleFavourite.setPressed(isEmergency);
         toggleFavourite.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 ContentValues values = new ContentValues();
@@ -145,25 +149,20 @@ public class ContactFragment extends Fragment implements
                 String favString = " marked emergency contacts";
                 if (toggleFavourite.isChecked()) {
                     values.put("isEmergency", "true"); //(key, value)
+
                 } else {
                     favString = " unmarked from emergency contacts";
                     values.put("isEmergency", "false");
                 }
-                Toast.makeText(getContext(), "Contact " + favString, Toast.LENGTH_SHORT).show();
 
-
-                resPartner.update(values, "_id = ? ", String.valueOf(row.getInt("_id"))); //update(ContentValues values, String where, String... args)
-
-                Log.i("Columns", resPartner.select().toString());
-
-                getContext().getContentResolver().notifyChange(resPartner.uri(), null); //(uri, ContentObserver)
-                /* Notify registered observers that a row was updated and attempt to sync changes to the network.
-                To register, call registerContentObserver().
-                 By default, CursorAdapter objects will get this notification.
-                  */
+//                Toast.makeText(getContext(), "Contact " + favString, Toast.LENGTH_SHORT).show();
+                resPartner.update(values, "_id = ? ", String.valueOf(row.getInt("_id")));
+                getContext().getContentResolver().notifyChange(resPartner.uri(), null);
 
             }
         });
+        toggleFavourite.setChecked(isEmergency); //saves the state
+
     }
 
     @Override
@@ -265,6 +264,47 @@ public class ContactFragment extends Fragment implements
         return true;
     }
 
+    @Override
+    public boolean getUserVisibleHint() {
+        return super.getUserVisibleHint();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Nullable
+    @Override
+    public View getView() {
+        return super.getView();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+
     @TargetApi(Build.VERSION_CODES.M)
     public void callToContact(String number) {
         Uri phoneCall;
@@ -278,4 +318,28 @@ public class ContactFragment extends Fragment implements
         }
     }
 
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
 }

@@ -60,7 +60,7 @@ public class EarthquakeService extends Service {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
             }
         };
 
@@ -94,40 +94,6 @@ public class EarthquakeService extends Service {
         thdsds.start();
         return START_STICKY;
     }
-
-//    @Override
-//    protected void onHandleIntent(@Nullable Intent intent) {
-//        referenceEarthquakes = FirebaseDatabase.getInstance().getReference().getRoot().child("realTimeEarthquakes");
-//        referenceUpdateTime = FirebaseDatabase.getInstance().getReference().getRoot().child("serverTrack").child("metaInfo").child("onlineLastTime");
-//
-//        fetchFromFirebase(); //if data changed then it fetches the earthquakes automatically
-//
-//
-//        while(true) {
-//            Thread ttttfs = new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    firebaseTime = getFirebaseTimeUsingCurl("https://earthquakesenotifications.firebaseio.com/serverTrack/metaInfo/onlineLastTime.json?print=pretty");
-//                    if (((new Date().getTime()) - firebaseTime) > 11000) {
-//                        Log.i("Periodic", " updateasdf!");
-//                        SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGS(), FirebaseDatabase.getInstance().getReference().getRoot());
-//                    }
-//                }
-//            });
-//            ttttfs.start();
-//            try {
-//                ttttfs.sleep(11000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//
-//        }
-//
-////        Looper.loop(); //keep current thread alive
-//
-//// curl 'https://earthquakesenotifications.firebaseio.com/serverTrack/metaInfo/onlineLastTime.json?print=pretty'
-//
-//    }
 
     private long getFirebaseTimeUsingCurl(final String urlStr) {
 
