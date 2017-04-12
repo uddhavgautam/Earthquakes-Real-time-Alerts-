@@ -1,10 +1,12 @@
 package com.liveEarthquakesAlerts.controller.services.locations;
 
+import android.Manifest;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
@@ -18,6 +20,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.telephony.SmsManager;
@@ -95,6 +98,10 @@ public class LocTrackService extends Service
             @Override
             public void onResult(@NonNull Status status) {
                 if (status.isSuccess()) {
+                    if (ActivityCompat.checkSelfPermission(LocTrackService.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(LocTrackService.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                        return;
+                    }
                     if (LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient) != null) {
                         isLocationUpdated = true;
                         LocationPOJO.location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
@@ -203,6 +210,10 @@ public class LocTrackService extends Service
     @Override
     public void onLocationChanged(Location location) { //main thread
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+         
+            return;
+        }
         if (LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient) != null) {
             LocationPOJO.location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             Log.i(TAG, String.valueOf(LocationPOJO.location.getLatitude() + " " + LocationPOJO.location.getLongitude()));

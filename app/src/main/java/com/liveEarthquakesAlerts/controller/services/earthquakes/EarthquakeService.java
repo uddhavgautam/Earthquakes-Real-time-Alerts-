@@ -71,22 +71,35 @@ public class EarthquakeService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         referenceEarthquakes = FirebaseDatabase.getInstance().getReference().getRoot().child("realTimeEarthquakes");
-        fetchFromFirebase(); //if data changed then it fetches the earthquakes automatically
 
         Thread thdsds = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (true) {
-                    firebaseTime = getFirebaseTimeUsingCurl("https://earthquakesenotifications.firebaseio.com/serverTrack/metaInfo/onlineLastTime.json?print=pretty");
-                    if (((new Date().getTime()) - firebaseTime) > 11000) {
-                        Log.i("Periodic", " updateasdf!");
-                        SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGS(), FirebaseDatabase.getInstance().getReference().getRoot());
-                        try {
-                            Thread.currentThread().sleep(11000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+
+                    //before fetching check if real-time database has not been deleted since after you initialized
+                    String myVarData = SaveResponseToDB.getFirebaseWholeData("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes.json?print=pretty");
+                    if ((!myVarData.equals("null"))) { //realtime db already exists
+                        fetchFromFirebase(); //if data changed then it fetches the earthquakes automatically
+
+                        firebaseTime = getFirebaseTimeUsingCurl("https://earthquakesenotifications.firebaseio.com/serverTrack/metaInfo/onlineLastTime.json?print=pretty");
+                        if (((new Date().getTime()) - firebaseTime) > 11000) {
+                            Log.i("Periodic", " updateasdf!");
+                            SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGS(), FirebaseDatabase.getInstance().getReference().getRoot());
+                            try {
+                                Thread.currentThread().sleep(11000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
+                    } else {
+                        Log.i("else", "no real time db");
+                        SaveResponseToDB.isInitialized = false;//initialized but not properly. Therefore isInitialized = false
+                        SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
+                        SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGS(), FirebaseDatabase.getInstance().getReference().getRoot());
                     }
+
+
                 }
             }
         });

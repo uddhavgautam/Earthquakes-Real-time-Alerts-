@@ -94,19 +94,18 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
                 if (!SaveResponseToDB.isInitialized) { //first time
                     doUpdate(items, databaseReference);
                 } else {
-                    Long newDataTime = items.getMetadata().getGenerated();
-                    Long firebaseTime = getFirebaseTimeUsingCurl("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes/metadata/generated.json?print=pretty");
+                    Long newGeneratedTime = items.getMetadata().getGenerated();
+                    Long oldGeneratedTimeInFirebase = getFirebaseTimeUsingCurl("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes/metadata/generated.json?print=pretty");
 
-                    Log.i("Time ", " difference USGS-Firebase: " + String.valueOf(newDataTime - firebaseTime));
+                    Log.i("Time ", " difference USGS-Firebase: " + String.valueOf(newGeneratedTime - oldGeneratedTimeInFirebase));
 
 
-                    if (newDataTime > firebaseTime) {
+                    if (newGeneratedTime > oldGeneratedTimeInFirebase) {
                         doUpdate(items, databaseReference);
                     } else {
                         //do nothing
                     }
                 }
-
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -129,7 +128,7 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
                 "      \"servers\": [\n" +
                 "        {\n" +
                 "          \"id\": \"myid\",\n" +
-                "          \"lastTime\": 1491873255092\n" +
+                "          \"lastTime\": \'lastTime\'\n" +
                 "        }\n" +
                 "      ]\n" +
                 "   }\n";
@@ -137,8 +136,10 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
         Map<String, Object> jsonMap = new Gson().fromJson(jsonString, new TypeToken<HashMap<String, Object>>() {
         }.getType());
 
-        databaseReference.child("serverTrack").setValue(jsonMap); //upload jsonOriginal on new "realTimeEarthquakes" node
-//        update_onlineLastTimeFirebase(databaseReference);
+        databaseReference.child("serverTrack").setValue(jsonMap);//upload jsonOriginal on new "realTimeEarthquakes" node
+
+        databaseReference.child("serverTrack").child("metaInfo").child("onlineLastTime").setValue(new Date().getTime());
+        update_onlineLastTimeFirebase(databaseReference);
     }
 
     private static Long getFirebaseTimeUsingCurl(String urlStr) {
@@ -194,7 +195,7 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
             Response response = new OkHttpClient().newCall(request).execute(); //OkHttpClient is HTTP client to request
             String str[] = response.body().string().split("\\n"); //because it prints with newline character with it
             myStr = str[0];
-            Log.i("firstLine", myStr);
+            Log.i("FirebaseDB", " firstLine " + myStr);
         } catch (IOException e) {
             e.printStackTrace();
         }
