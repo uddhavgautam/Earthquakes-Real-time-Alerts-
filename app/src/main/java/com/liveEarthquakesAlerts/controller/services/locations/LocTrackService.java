@@ -23,6 +23,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.content.ContextCompat;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
@@ -98,8 +99,7 @@ public class LocTrackService extends Service
             @Override
             public void onResult(@NonNull Status status) {
                 if (status.isSuccess()) {
-                    if (ActivityCompat.checkSelfPermission(LocTrackService.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(LocTrackService.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
+                    if (ContextCompat.checkSelfPermission(LocTrackService.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(LocTrackService.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         return;
                     }
                     if (LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient) != null) {
@@ -191,7 +191,13 @@ public class LocTrackService extends Service
         myOwnCustomLog.addLog(simpleName, Thread.currentThread().getStackTrace()[2].getMethodName().toString(), stackTraces);
 
         buildLocationSettingsRequest();
-        createLocationRequest();
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                createLocationRequest(); //Because LocationRequest permission can only be done from the Activity
+            }
+        });
 
     }
 

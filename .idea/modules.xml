@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/LiveEarthquakesAlerts.iml" filepath="$PROJECT_DIR$/LiveEarthquakesAlerts.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/odoo-rpc-v3/odoo-rpc-v3.iml" filepath="$PROJECT_DIR$/odoo-rpc-v3/odoo-rpc-v3.iml" />
+    </modules>
+  </component>
+</project>

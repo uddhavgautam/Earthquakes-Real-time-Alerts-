@@ -1,6 +1,7 @@
 package com.liveEarthquakesAlerts.controller.services.earthquakes;
 
 
+import android.app.ActivityManager;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -74,8 +75,10 @@ public class EarthquakeService extends Service {
 
 
         final Thread thsdfdsfds = new Thread(new Runnable() {
+
             @Override
             public void run() {
+                Log.i("Thread watchout: ", Thread.currentThread().getName() + "");
                 //before fetching check if real-time database has not been deleted since after you initialized
                 String myVarData = SaveResponseToDB.getFirebaseWholeData("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes.json?print=pretty");
                 if ((!myVarData.equals("null"))) { //realtime db already exists
@@ -103,6 +106,9 @@ public class EarthquakeService extends Service {
         Thread thdsds = new Thread(new Runnable() { //UI thread is not getting blocked
             @Override
             public void run() {
+                Log.i("Thread watchout: ", Thread.currentThread().getName() + "");
+                Log.i("Process watchout1: ", ActivityManager.RunningAppProcessInfo.class.getCanonicalName());
+
                 int counttt = 0;
 
                 while (true) {
@@ -144,7 +150,7 @@ public class EarthquakeService extends Service {
 
     @Override
     public void onDestroy() {
-        App.bus.unregister(this);
+//        App.bus.unregister(this);
         Log.i(TAG, "EarthquakeService destroyed!");
     }
 

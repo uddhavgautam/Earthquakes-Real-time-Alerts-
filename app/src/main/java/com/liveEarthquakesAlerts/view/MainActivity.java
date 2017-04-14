@@ -1,11 +1,16 @@
 package com.liveEarthquakesAlerts.view;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -49,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static String bannerText;
     public static Intent locInitServiceIntent;
     private static IncomingReceiver incomingReceiver;
+    private static Intent intentsad;
     private final String TAG = "MainActivity";
     private ProgressDialog pd;
     private ListView list;
@@ -77,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar1);
 
+        intentsad = new Intent();
 
 ////        remove the left margin from the logo
         mToolbar.setPadding(2, 0, 0, 0);//for tab otherwise give space in tab
@@ -117,8 +124,35 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         list.setOnScrollListener(this);
         list.setOnItemClickListener(this);
 
+        //make sure firebase realtime DB initialized completed. Why? Because as LocTrackService gets the location
+        //I start fetching from firebase. There I create reference. If I don't have already initialized, then it throws null pointer
+        //exception on those references
+        locInitServiceIntent = new Intent(this, LocTrackService.class);
+
+
+        //main thread should not be blocked. Therefore, two solutions here:
+        //1) Either I create another thread and run startService(locInitServiceIntent) from there. Make the created thread never dies and listen from the thread when I updated firebase database
+        //2) BroadcastReceiver. Since there is chain like "main thread> another threadX > main therad > another thread> another thread> main thread> another threadZ. Our situation is like communication threadX and threadZ.
+
+        incomingReceiver = new IncomingReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i("Intentmy", intent.getBooleanExtra("LocationPermissionAlready", false) + "");
+                if (intent.getBooleanExtra("isInitializedAlready", false) && intent.getBooleanExtra("LocationPermissionAlready", false)) { //it means already initialized
+                    Log.i(TAG, "Successfully loctracking service is triggered!");
+                    startService(locInitServiceIntent);
+                }
+            }
+        };
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("SaveResponseToDB.isInitialized.Uddhav");
+        registerReceiver(incomingReceiver, intentFilter);
+
+
 
     }
+
 
     private void initializeFirebaseRealtimeDB() {
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot();
@@ -127,6 +161,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Thread newThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                Log.i("Thread watchout: ", Thread.currentThread().getName() + "");
+
                 //if there is data. Don't do null checking using "==" operator. This understanding is wrong
 
                 //Note: Firebase writes "null" string for null
@@ -138,9 +174,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     Log.i("else", "inside elsewer, realtime DB already exists");
 //                    create Firebase Realtime DB jsonOriginal structure and upload earthquake JSON
                     SaveResponseToDB.isInitialized = true;
-                    Intent intent = new Intent();
-                    intent.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("isInitializedAlready", SaveResponseToDB.isInitialized);
-                    sendBroadcast(intent);
+                    intentsad.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("isInitializedAlready", SaveResponseToDB.isInitialized);
+                    sendBroadcast(intentsad);
 
 
                 } else {
@@ -156,6 +191,37 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.i("case1", "inside99");
+
+        switch (requestCode) {
+            case 99: {
+                Log.i("case2", "inside99");
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.i("case3", "inside99");
+
+                    // permission was granted, yay! Do the
+                    // location-related task you need to do.
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        Log.i("case4", "inside99");
+
+                        intentsad.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("LocationPermissionAlready", SaveResponseToDB.isInitialized);
+                        sendBroadcast(intentsad);
+
+                    } else {
+
+                        // permission denied, boo! Disable the
+                        // functionality that depends on this permission.
+
+                    }
+                    return;
+                }
+            }
+        }
+    }
+
+    @Override
     protected void onStart() { //main thread
         super.onStart();
 
@@ -164,32 +230,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String simpleName = this.getClass().getSimpleName();
         myOwnCustomLog.addLog(simpleName, Thread.currentThread().getStackTrace()[2].getMethodName().toString(), stackTraces);
 
-
-        //make sure firebase realtime DB initialized completed. Why? Because as LocTrackService gets the location
-        //I start fetching from firebase. There I create reference. If I don't have already initialized, then it throws null pointer
-        //exception on those references
-        locInitServiceIntent = new Intent(this, LocTrackService.class);
-
-        //main thread should not be blocked. Therefore, two solutions here:
-        //1) Either I create another thread and run startService(locInitServiceIntent) from there. Make the created thread never dies and listen from the thread when I updated firebase database
-        //2) BroadcastReceiver. Since there is chain like "main thread> another threadX > main therad > another thread> another thread> main thread> another threadZ. Our situation is like communication threadX and threadZ.
-
-        incomingReceiver = new IncomingReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getBooleanExtra("isInitializedAlready", false)) { //it means already initialized
-                    Log.i(TAG, "Successfully loctracking service is triggered!");
-                    startService(locInitServiceIntent);
-                }
-            }
-        };
-
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("SaveResponseToDB.isInitialized.Uddhav");
-        registerReceiver(incomingReceiver, intentFilter);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.i("Requesting", "IamRequesting");
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 99);
+        } else {
+            intentsad.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("LocationPermissionAlready", SaveResponseToDB.isInitialized);
+            sendBroadcast(intentsad);
+        }
 
         initializeFirebaseRealtimeDB(); //completed
-
 
         App.bus.register(this);
 

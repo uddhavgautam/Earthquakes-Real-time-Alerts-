@@ -208,6 +208,7 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
             @Override
             public void run() {
                 try {
+                    Log.i("Thread watchout: ", Thread.currentThread().getName() + "");
 
                     for (DataSnapshot feature : dataSnapshot.child("features").getChildren()) {
 
