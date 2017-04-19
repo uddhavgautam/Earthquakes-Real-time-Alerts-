@@ -150,9 +150,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         intentFilter.addAction("SaveResponseToDB.isInitialized.Uddhav");
         if (!isRegistered) {
             registerReceiver(incomingReceiver, intentFilter);
-
+            isRegistered = true;
         }
-        isRegistered = true;
 
     }
 
@@ -260,6 +259,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onStop();
         if (isRegistered) {
             unregisterReceiver(incomingReceiver);
+            isRegistered = false;
         }
         App.bus.unregister(this); //Unregister of Otto Bus
     }
