@@ -1,7 +1,6 @@
 package com.liveEarthquakesAlerts.controller.utils;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -167,11 +166,11 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
 //                    Pass this information to main activity
 
                     //send this true message via OutgoingReceiver
-                    Intent intent = new Intent();
-                    intent.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("isInitializedAlreaqdy", SaveResponseToDB.isInitialized);
-                    Log.i(TAG, "loctracking service FROM LONG RUN");
-                    context.sendBroadcast(intent);
-                    Log.i(TAG, "Firebase onlineLastTime updated!");
+//                    Intent intentsda = new Intent();
+//                    intentsda.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("isInitializedAlready", SaveResponseToDB.isInitialized);
+//                    Log.i(TAG, "loctracking service FROM LONG RUN");
+//                    context.sendBroadcast(intentsda);
+//                    Log.i(TAG, "Firebase onlineLastTime updated!");
                 } else {
                     unSuccessfulAttempts++;
                     if (unSuccessfulAttempts > 2) {
@@ -208,8 +207,6 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
             @Override
             public void run() {
                 try {
-                    Log.i("Thread watchout: ", Thread.currentThread().getName() + "");
-
                     for (DataSnapshot feature : dataSnapshot.child("features").getChildren()) {
 
                         time = parseLong(feature.child("properties").child("time").getValue().toString());

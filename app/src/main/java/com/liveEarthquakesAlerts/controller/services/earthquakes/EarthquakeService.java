@@ -51,7 +51,6 @@ public class EarthquakeService extends Service {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (OnLineTracker.isOnline(getApplicationContext())) { //check every time online
                     SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
-                    Log.i("Inside", "on start command!");
                     clientHelper.getDataFromFirebase(dataSnapshot);
 
                 } else {
@@ -78,13 +77,13 @@ public class EarthquakeService extends Service {
 
             @Override
             public void run() {
-                Log.i("Thread watchout: ", Thread.currentThread().getName() + "");
+                Log.i("Thread watchoutfhghf: ", Thread.currentThread().getName() + "");
                 //before fetching check if real-time database has not been deleted since after you initialized
                 String myVarData = SaveResponseToDB.getFirebaseWholeData("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes.json?print=pretty");
                 if ((!myVarData.equals("null"))) { //realtime db already exists
                     fetchFromFirebase(); //if data changed then it fetches the earthquakes automatically
 
-                    firebaseTime = getFirebaseTimeUsingCurl("https://earthquakesenotifications.firebaseio.com/serverTrack/metaInfo/onlineLastTime.json?print=pretty");
+                    firebaseTime = getFirebaseTimeUsingCurl();
                     if (((new Date().getTime()) - firebaseTime) > 11000) {
                         Log.i("Periodic", " updateasdf!");
                         SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGS(), FirebaseDatabase.getInstance().getReference().getRoot());
@@ -116,8 +115,9 @@ public class EarthquakeService extends Service {
                     thsdfdsfds.setPriority(Thread.MAX_PRIORITY);
                     if (counttt == 1)
                         thsdfdsfds.start();
+                    counttt = 0;
                     try {
-                        Thread.sleep(21000);
+                        Thread.sleep(11000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -130,9 +130,9 @@ public class EarthquakeService extends Service {
         return START_STICKY;
     }
 
-    private long getFirebaseTimeUsingCurl(final String urlStr) {
+    private long getFirebaseTimeUsingCurl() {
 
-        Request request = new Request.Builder().url(urlStr).build(); //Request builder is used to get JSON url
+        Request request = new Request.Builder().url("https://earthquakesenotifications.firebaseio.com/serverTrack/metaInfo/onlineLastTime.json?print=pretty").build(); //Request builder is used to get JSON url
 
         try {
             Response response = new OkHttpClient().newCall(request).execute(); //OkHttpClient is HTTP client to request

@@ -54,8 +54,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static String bannerText;
     public static Intent locInitServiceIntent;
     public static boolean isRegistered = false;
+    public static Intent broadcastIntent = new Intent();
     private static IncomingReceiver incomingReceiver;
-    private static Intent intentsad;
     private final String TAG = "MainActivity";
     private ProgressDialog pd;
     private ListView list;
@@ -83,8 +83,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
 
         Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar1);
-
-        intentsad = new Intent();
 
 ////        remove the left margin from the logo
         mToolbar.setPadding(2, 0, 0, 0);//for tab otherwise give space in tab
@@ -141,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Log.i("Intentmy", intent.getBooleanExtra("LocationPermissionAlready", false) + "");
                 if (intent.getBooleanExtra("isInitializedAlready", false) && intent.getBooleanExtra("LocationPermissionAlready", false)) { //it means already initialized
                     Log.i(TAG, "Successfully loctracking service is triggered!");
+
                     startService(locInitServiceIntent);
                 }
             }
@@ -163,8 +162,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Thread newThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.i("Thread watchout: ", Thread.currentThread().getName() + "");
-
                 //if there is data. Don't do null checking using "==" operator. This understanding is wrong
 
                 //Note: Firebase writes "null" string for null
@@ -176,8 +173,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     Log.i("else", "inside elsewer, realtime DB already exists");
 //                    create Firebase Realtime DB jsonOriginal structure and upload earthquake JSON
                     SaveResponseToDB.isInitialized = true;
-                    intentsad.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("isInitializedAlready", SaveResponseToDB.isInitialized);
-                    sendBroadcast(intentsad);
+                    broadcastIntent.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("isInitializedAlready", SaveResponseToDB.isInitialized);
+                    sendBroadcast(broadcastIntent);
 
 
                 } else {
@@ -208,10 +205,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                         Log.i("case4", "inside99");
 
-                        intentsad.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("LocationPermissionAlready", SaveResponseToDB.isInitialized);
-                        sendBroadcast(intentsad);
+                        broadcastIntent.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("LocationPermissionAlready", true);
+                        sendBroadcast(broadcastIntent);
 
-                    } else {
+                    } else { // if user doen't enable location settings
+
+                        broadcastIntent.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("LocationPermissionAlready", false);
+                        sendBroadcast(broadcastIntent);
 
                         // permission denied, boo! Disable the
                         // functionality that depends on this permission.
@@ -232,15 +232,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String simpleName = this.getClass().getSimpleName();
         myOwnCustomLog.addLog(simpleName, Thread.currentThread().getStackTrace()[2].getMethodName().toString(), stackTraces);
 
+        //first work: to check location permission, if not enabled, ask user to enable
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.i("Requesting", "IamRequesting");
+            Log.i("shdlfsdkfjkdj", "if");
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 99);
         } else {
-            intentsad.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("LocationPermissionAlready", SaveResponseToDB.isInitialized);
-            sendBroadcast(intentsad);
+            Log.i("shdlfsdkfjkdj", "else");
+            broadcastIntent.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("LocationPermissionAlready", true);
+            sendBroadcast(broadcastIntent);
+
         }
 
+
+        //second work: update JSON from USGS to Firebase
         initializeFirebaseRealtimeDB(); //completed
 
         App.bus.register(this);
