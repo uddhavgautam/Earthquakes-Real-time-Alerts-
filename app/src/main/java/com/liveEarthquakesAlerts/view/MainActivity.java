@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public static String bannerText;
     public static Intent locInitServiceIntent;
+    public static boolean isRegistered = false;
     private static IncomingReceiver incomingReceiver;
     private static Intent intentsad;
     private final String TAG = "MainActivity";
@@ -147,9 +148,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("SaveResponseToDB.isInitialized.Uddhav");
-        registerReceiver(incomingReceiver, intentFilter);
+        if (!isRegistered) {
+            registerReceiver(incomingReceiver, intentFilter);
 
-
+        }
+        isRegistered = true;
 
     }
 
@@ -230,7 +233,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String simpleName = this.getClass().getSimpleName();
         myOwnCustomLog.addLog(simpleName, Thread.currentThread().getStackTrace()[2].getMethodName().toString(), stackTraces);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.i("Requesting", "IamRequesting");
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 99);
         } else {
@@ -254,7 +258,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onStop() {
         super.onStop();
-        unregisterReceiver(incomingReceiver);
+        if (isRegistered) {
+            unregisterReceiver(incomingReceiver);
+        }
         App.bus.unregister(this); //Unregister of Otto Bus
     }
 
