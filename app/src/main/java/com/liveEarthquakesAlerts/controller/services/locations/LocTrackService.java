@@ -93,7 +93,7 @@ public class LocTrackService extends Service
         mLocationRequest.setInterval(10000); //10 seconds
         mLocationRequest.setSmallestDisplacement(500); //500 meters changed
         mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
 
         PendingResult<Status> pendingStatus = LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         pendingStatus.setResultCallback(new ResultCallback<Status>() {

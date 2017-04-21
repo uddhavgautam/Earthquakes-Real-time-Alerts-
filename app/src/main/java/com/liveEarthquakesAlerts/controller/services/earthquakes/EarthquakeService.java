@@ -73,34 +73,6 @@ public class EarthquakeService extends Service {
         referenceEarthquakes = FirebaseDatabase.getInstance().getReference().getRoot().child("realTimeEarthquakes");
 
 
-        final Thread thsdfdsfds = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                Log.i("Thread watchoutfhghf: ", Thread.currentThread().getName() + "");
-                //before fetching check if real-time database has not been deleted since after you initialized
-                String myVarData = SaveResponseToDB.getFirebaseWholeData("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes.json?print=pretty");
-                if ((!myVarData.equals("null"))) { //realtime db already exists
-                    fetchFromFirebase(); //if data changed then it fetches the earthquakes automatically
-
-                    firebaseTime = getFirebaseTimeUsingCurl();
-                    if (((new Date().getTime()) - firebaseTime) > 11000) {
-                        Log.i("Periodic", " updateasdf!");
-                        SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGS(), FirebaseDatabase.getInstance().getReference().getRoot());
-                        try {
-                            Thread.currentThread().sleep(11000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } else {
-                    Log.i("else", "no real time db");
-                    SaveResponseToDB.isInitialized = false;//initialized but not properly. Therefore isInitialized = false
-                    SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
-                    SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGS(), FirebaseDatabase.getInstance().getReference().getRoot());
-                }
-            }
-        });
 
         Thread thdsds = new Thread(new Runnable() { //UI thread is not getting blocked
             @Override
@@ -111,13 +83,44 @@ public class EarthquakeService extends Service {
                 int counttt = 0;
 
                 while (true) {
-                    counttt++;
-                    thsdfdsfds.setPriority(Thread.MAX_PRIORITY);
-                    if (counttt == 1)
-                        thsdfdsfds.start();
-                    counttt = 0;
+
+                    Thread thsdfdsfds = new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            Log.i("Thread watchoutfhghf: ", Thread.currentThread().getName() + "");
+                            //before fetching check if real-time database has not been deleted since after you initialized
+                            String myVarData = SaveResponseToDB.getFirebaseWholeData("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes.json?print=pretty");
+                            if ((!myVarData.equals("null"))) { //realtime db already exists
+                                fetchFromFirebase(); //if data changed then it fetches the earthquakes automatically
+
+                                firebaseTime = getFirebaseTimeUsingCurl();
+                                if (((new Date().getTime()) - firebaseTime) > 11000) {
+                                    Log.i("Periodic", " updateasdf!");
+                                    SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGS(), FirebaseDatabase.getInstance().getReference().getRoot());
+                                    try {
+                                        Thread.currentThread().sleep(11000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            } else {
+                                Log.i("else", "no real time db");
+                                SaveResponseToDB.isInitialized = false;//initialized but not properly. Therefore isInitialized = false
+                                SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
+                                SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGS(), FirebaseDatabase.getInstance().getReference().getRoot());
+                            }
+                        }
+                    });
+
                     try {
-                        Thread.sleep(11000);
+                        thsdfdsfds.start();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        Thread.sleep(21000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

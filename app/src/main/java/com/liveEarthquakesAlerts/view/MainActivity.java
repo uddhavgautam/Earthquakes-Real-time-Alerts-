@@ -304,7 +304,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //update the adapter
             List<EarthQuakes> EarthQuakeList;
             Log.i("ConnectInternet", "true");
-            if (AppSettings.getInstance().getProximity() == 1) {
+            if (AppSettings.getInstance().getProximity() == 1) { //user-proximity
+                list.setAdapter(null); //clears everything
                 EarthQuakeList = new EarthQuakes().GetAllDataUserProximity();
                 if (EarthQuakeList.size() > 0) {
                     adapter = new ListViewAdapter(MainActivity.this, EarthQuakeList);
@@ -314,7 +315,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
 
-            if (AppSettings.getInstance().getProximity() == 0) {
+            if (AppSettings.getInstance().getProximity() == 0) { //world-wide
+                list.setAdapter(null); //clears everything
                 EarthQuakeList = new EarthQuakes().GetAllData();
 
                 if (EarthQuakeList.size() > 0) {
