@@ -103,6 +103,7 @@ public class LocTrackService extends Service
                     if (ContextCompat.checkSelfPermission(LocTrackService.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(LocTrackService.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         return;
                     }
+
                     if (LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient) != null) {
                         isLocationUpdated = true;
                         LocationPOJO.location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
@@ -125,12 +126,10 @@ public class LocTrackService extends Service
                             //now I got the location, start EarthquakeService to fetch earthquakes
 
                             if (LocationPOJO.location != null)
-                                Log.i("sfasdfafas", "starting earthquake service");
                                 getApplicationContext().startService(new Intent(getApplicationContext(), EarthquakeService.class));
 
 
                         } catch (IOException e) {
-                            Log.i("GoogleAPIClient", " not connected yet sir!");
                             e.printStackTrace();
                         }
                     }
@@ -173,20 +172,15 @@ public class LocTrackService extends Service
     public int onStartCommand(Intent intent, int flags, int startId) { //main thread
         super.onStartCommand(intent, flags, startId);
 
-        Log.i(TAG, "inside thread of sfasdfafas LocTrackService!");
         if (!buildFlag) {
-            Log.i(TAG, "inside thread sfasdfafas of buildFlagFalse !");
             buildGoogleApiClient();
         }
         if (mGoogleApiClient != null) {
             if (!mGoogleApiClient.isConnected()) { /* if already not connected then only connect */
-                Log.i(TAG, "inside thread of sfasdfafas isNotConnectedAlready !");
                 mGoogleApiClient.connect();
             } else {
-                Log.i(TAG, "inside thread of sfasdfafas isConnectedAlready !");
                 if (isLocationUpdated) {
                     if (LocationPOJO.location != null) {
-                        Log.i(TAG, "inside thread of sfasdfafas already location got !");
                         getApplicationContext().startService(new Intent(getApplicationContext(), EarthquakeService.class));
                     }
                 }
@@ -203,7 +197,6 @@ public class LocTrackService extends Service
     public void onConnected(@Nullable Bundle bundle) { //This is Async request, obviously should be from the main thread. Because we are not sure,
         //after how many minutes it will get connected. Other threads are possible to die but not main thread
         count++;
-        Log.i(TAG, "Inside GoogleApiClient sfasdfafas onConnected");
         StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
         String simpleName = this.getClass().getSimpleName();
         myOwnCustomLog.addLog(simpleName, Thread.currentThread().getStackTrace()[2].getMethodName().toString(), stackTraces);
@@ -218,7 +211,6 @@ public class LocTrackService extends Service
                         mGoogleApiClient.connect();
 
                     } else {
-                        Log.i("sfasdfafas", "sfasdfafas");
                         createLocationRequest(); //Because LocationRequest permission can only be done from the Activity
                     }
                 }
@@ -230,7 +222,6 @@ public class LocTrackService extends Service
     @Override
     public void onConnectionSuspended(int i) {
         Log.i(TAG, "GoogleApiClient suspended!");
-
     }
 
     @Override

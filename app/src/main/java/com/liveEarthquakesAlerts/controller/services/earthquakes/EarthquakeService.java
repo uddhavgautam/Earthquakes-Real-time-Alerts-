@@ -1,7 +1,6 @@
 package com.liveEarthquakesAlerts.controller.services.earthquakes;
 
 
-import android.app.ActivityManager;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -14,6 +13,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.liveEarthquakesAlerts.controller.utils.App;
+import com.liveEarthquakesAlerts.controller.utils.AppSettings;
 import com.liveEarthquakesAlerts.controller.utils.BusStatus;
 import com.liveEarthquakesAlerts.controller.utils.CreateRequestUrl;
 import com.liveEarthquakesAlerts.controller.utils.OnLineTracker;
@@ -39,12 +39,10 @@ public class EarthquakeService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "EarthquakeService created!");
     }
 
 
     private void fetchFromFirebase() {
-        Log.i("fetch from", "databases updateasdf");
 
         final ValueEventListener valueEventListenerEarthquake = new ValueEventListener() {
             @Override
@@ -52,6 +50,29 @@ public class EarthquakeService extends Service {
                 if (OnLineTracker.isOnline(getApplicationContext())) { //check every time online
                     SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
                     clientHelper.getDataFromFirebase(dataSnapshot);
+
+                } else {
+                    App.bus.post(new BusStatus(999));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+            }
+        };
+
+        referenceEarthquakes.addValueEventListener(valueEventListenerEarthquake);
+    }
+
+    private void fetchPartialDataFromFirebase() {
+
+        final ValueEventListener valueEventListenerEarthquake = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (OnLineTracker.isOnline(getApplicationContext())) { //check every time online
+                    SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
+                    clientHelper.getPartialDataFromFirebase(dataSnapshot);
 
                 } else {
                     App.bus.post(new BusStatus(999));
@@ -77,9 +98,6 @@ public class EarthquakeService extends Service {
         Thread thdsds = new Thread(new Runnable() { //UI thread is not getting blocked
             @Override
             public void run() {
-                Log.i("Thread watchout: ", Thread.currentThread().getName() + "");
-                Log.i("Process watchout1: ", ActivityManager.RunningAppProcessInfo.class.getCanonicalName());
-
                 int counttt = 0;
 
                 while (true) {
@@ -88,16 +106,18 @@ public class EarthquakeService extends Service {
 
                         @Override
                         public void run() {
-                            Log.i("Thread watchoutfhghf: ", Thread.currentThread().getName() + "");
                             //before fetching check if real-time database has not been deleted since after you initialized
                             String myVarData = SaveResponseToDB.getFirebaseWholeData("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes.json?print=pretty");
                             if ((!myVarData.equals("null"))) { //realtime db already exists
+                                if (AppSettings.getInstance().getProximity() == 0)
                                 fetchFromFirebase(); //if data changed then it fetches the earthquakes automatically
+                                else
+                                    fetchPartialDataFromFirebase(); //if data changed then it fetches the earthquakes automatically
+
 
                                 firebaseTime = getFirebaseTimeUsingCurl();
                                 if (((new Date().getTime()) - firebaseTime) > 11000) {
-                                    Log.i("Periodic", " updateasdf!");
-                                    SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGS(), FirebaseDatabase.getInstance().getReference().getRoot());
+                                    SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGSAlwaysFullUpdate(), FirebaseDatabase.getInstance().getReference().getRoot());
                                     try {
                                         Thread.currentThread().sleep(11000);
                                     } catch (InterruptedException e) {
@@ -105,10 +125,9 @@ public class EarthquakeService extends Service {
                                     }
                                 }
                             } else {
-                                Log.i("else", "no real time db");
                                 SaveResponseToDB.isInitialized = false;//initialized but not properly. Therefore isInitialized = false
                                 SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
-                                SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGS(), FirebaseDatabase.getInstance().getReference().getRoot());
+                                SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGSAlwaysFullUpdate(), FirebaseDatabase.getInstance().getReference().getRoot());
                             }
                         }
                     });

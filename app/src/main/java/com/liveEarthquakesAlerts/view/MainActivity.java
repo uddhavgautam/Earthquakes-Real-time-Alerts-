@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     Log.i("else", "no real time db");
                     SaveResponseToDB.isInitialized = false;//initialized but not properly. Therefore isInitialized = false
                     SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
-                    SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGS(), databaseReference);
+                    SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGSAlwaysFullUpdate(), databaseReference);
                 }
 
             }

@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.liveEarthquakesAlerts.controller.utils.broadcastReceiver.OutgoingReceiver;
+import com.liveEarthquakesAlerts.model.LocationPOJO;
 import com.liveEarthquakesAlerts.model.database.DatabaseHelper;
 import com.liveEarthquakesAlerts.model.database.EarthQuakes;
 import com.liveEarthquakesAlerts.model.database.RiskyEarthquakes;
@@ -263,6 +264,76 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
         }
 
     }
+
+    public void getPartialDataFromFirebase(final DataSnapshot dataSnapshot) { //save every earthquake fields like magnitude, latitude etc.
+
+        Thread thread = new Thread(new Runnable() { //should do network operation using separate thread; can't do from main thread
+            @Override
+            public void run() {
+                try {
+                    for (DataSnapshot feature : dataSnapshot.child("features").getChildren()) {
+                        float currentLat = (float) LocationPOJO.location.getLatitude();
+                        float currentLong = (float) LocationPOJO.location.getLongitude();
+
+                        longitude = Float.parseFloat(feature.child("geometry").child("coordinates").child("0").getValue().toString());
+                        latitude = Float.parseFloat(feature.child("geometry").child("coordinates").child("1").getValue().toString());
+
+
+                        if (((currentLong - 2.89 <= longitude) && (longitude <= currentLong + 2.89)) && ((currentLat - 2.91 <= latitude) && (latitude <= currentLat + 2.91))) {
+                            time = parseLong(feature.child("properties").child("time").getValue().toString());
+
+                            str1 = feature.child("properties").child("place").getValue().toString().trim().toUpperCase();
+                            locationName = str1.substring(str1.indexOf("of") + 3);
+                            sig = Integer.parseInt(feature.child("properties").child("sig").getValue().toString());
+                            magnitude = Float.parseFloat(feature.child("properties").child("mag").getValue().toString());
+                            depth = Float.parseFloat(feature.child("geometry").child("coordinates").child("2").getValue().toString());
+
+
+//                        update Earthquake object
+                            EarthQuakes eq = new EarthQuakes(); //EarthQuakes is a bean
+                            eq.setSig(sig);
+                            eq.setDateMilis(time);
+                            eq.setDepth(round(depth, decimalPlace)); //depth means altitude. In this way, database is getting updated
+                            eq.setLatitude(latitude);
+                            eq.setLongitude(longitude);
+                            eq.setLocationName(locationName);
+                            eq.setMagnitude(round(magnitude, decimalPlace));
+
+                            eq.Insert();
+
+                            if (CheckRiskEarthquakes.checkRisky(latitude, longitude, sig)) {
+                                RiskyEarthquakes riskyEarthquakes = new RiskyEarthquakes();
+                                riskyEarthquakes.setSig(sig);
+                                riskyEarthquakes.setDateMilis(time);
+                                riskyEarthquakes.setDepth(round(depth, decimalPlace)); //depth means altitude. In this way, database is getting updated
+                                riskyEarthquakes.setLatitude(latitude);
+                                riskyEarthquakes.setLongitude(longitude);
+                                riskyEarthquakes.setLocationName(locationName);
+                                riskyEarthquakes.setMagnitude(round(magnitude, decimalPlace));
+                                riskyEarthquakes.Insert();
+                            }
+                        }
+                        Log.i("Bus", "posted successful event");
+
+                        //I got the earthquakes
+
+                        App.bus.post(new BusStatus(123)); //post event into the Otto bus
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        try {
+            thread.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
     public float round(float d, int decimalPlace) {
         BigDecimal bd = new BigDecimal(Float.toString(d));
