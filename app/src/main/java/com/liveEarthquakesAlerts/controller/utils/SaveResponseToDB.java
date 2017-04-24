@@ -50,6 +50,7 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
     private static OutgoingReceiver outgoingReceiver;
     private static POJOUSGS<String, MetadataUSGS, FeaturesUSGS<PropertiesUSGS, GeometryUSGS>, Float> items;
     private static Context context;
+    private static boolean isInitialized1 = false;
     private Integer sig, decimalPlace = 1;
     private long time;
     private Float longitude, latitude, depth, magnitude;
@@ -138,7 +139,14 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
 
         databaseReference.child("serverTrack").setValue(jsonMap);//upload jsonOriginal on new "realTimeEarthquakes" node
 
-        databaseReference.child("serverTrack").child("metaInfo").child("onlineLastTime").setValue(new Date().getTime());
+        databaseReference.child("serverTrack").child("metaInfo").child("onlineLastTime").setValue(new Date().getTime()).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    SaveResponseToDB.isInitialized1 = true;
+                }
+            }
+        });
         update_onlineLastTimeFirebase(databaseReference);
     }
 
@@ -163,7 +171,8 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    SaveResponseToDB.isInitialized = true; //I successfully initialized Firebase Realtime DB
+//                    This guarantees successful update
+                    SaveResponseToDB.isInitialized = true && SaveResponseToDB.isInitialized1; //I successfully initialized Firebase Realtime DB
 //                    Pass this information to main activity
 
                     //send this true message via OutgoingReceiver
