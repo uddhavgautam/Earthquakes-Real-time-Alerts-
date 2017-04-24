@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/e_contact"
-        android:icon="@drawable/econtact"
+        android:icon="@mipmap/e_contact"
         android:orderInCategory="100"
         android:title="e-contacts"
         android:visible="false"
@@ -12,7 +12,6 @@
         tools:ignore="AlwaysShowAction,HardcodedText" />
 
     <item
-        android:id="@+id/e_logo"
         android:enabled="true"
         android:icon="@drawable/threedotsicon"
         android:orderInCategory="100"

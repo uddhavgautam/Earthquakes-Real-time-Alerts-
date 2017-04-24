@@ -11,6 +11,7 @@
         android:id="@+id/favContactList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:cacheColorHint="#00000000"
         android:divider="#aaaaaa"
         android:dividerHeight="0.1dp" />
 

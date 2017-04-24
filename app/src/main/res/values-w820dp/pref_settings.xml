@@ -6,19 +6,19 @@
     <!-- ############ date_range ################## -->
 
     <string name="listPref_DialogTitle_TimeInterval">Time Interval</string>
-    <string name="listPref_Summary_TimeInterval">Last 7 Hours</string>
+    <string name="listPref_Summary_TimeInterval">Last Hour</string>
     <string name="listPref_Title_TimeInterval">Select TimeInterval</string>
     <string name="listPref_Key_TimeInterval">Key_TimeInterval</string>
     <string name="listPref_DefaultValue_TimeInterval">0</string>
 
     <string-array name="array_TimeInterval">
-        <item>Last 7 Hours</item>
         <item>Last Hour</item>
+        <!--<item>Last 7 Hours</item>-->
 
     </string-array>
     <string-array name="array_TimeInterval_Values">
         <item>0</item>
-        <item>1</item>
+        <!--<item>1</item>-->
     </string-array>
 
     <!-- ############# source_list ################# -->

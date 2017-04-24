@@ -22,6 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:cacheColorHint="#00000000"
         android:divider="#b5b5b5"
         android:dividerHeight="1dp"
         android:listSelector="@drawable/list_selector" />
@@ -51,7 +52,7 @@
             android:background="@color/statusbar"
             android:gravity="center"
             android:padding="16dp"
-            android:text="X miles"
+            android:text="X miles far!"
             android:textColor="@color/android_white"
             android:textSize="25sp"
             android:textStyle="bold" />

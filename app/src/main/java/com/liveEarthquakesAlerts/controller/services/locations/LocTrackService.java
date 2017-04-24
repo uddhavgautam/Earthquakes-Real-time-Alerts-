@@ -346,7 +346,7 @@ public class LocTrackService extends Service
 
     private void createNotification(String strContentTitle, String strContentText) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext()) //
-                .setSmallIcon(R.drawable.icon1) //
+                .setSmallIcon(R.drawable.ic_action_eq) //
                 .setContentTitle(strContentTitle) //
                 .setContentText(strContentText);
         Intent resultIntent = new Intent(this, MainActivity.class);

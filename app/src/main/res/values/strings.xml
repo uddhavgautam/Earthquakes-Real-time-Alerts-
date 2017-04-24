@@ -3,7 +3,7 @@
 <resources>
 
     <string name="app_name">EarthquakesNotificationTool</string>
-    <string name="title_activity">Earthquakes</string>
+    <string name="title_activity">Real-time Earthquakes</string>
     <string name="EarthquakesDetect">Earthquake Detected!</string>
     <string name="NoConnection">Internet connection was not found!</string>
     <string name="MapCanNotBeDisplayed">Map can not be displayed</string>
@@ -78,13 +78,18 @@ Main Screen shows real-time earthquakes based on your settings.
     </string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="large_textt">
-        "About Developer\n\n"
+        <b>"About Developer \n"</b>
         "Uddhav Gautam\n"
-        "upgautam@ualr.edu\n"
-        "infofuniversities@gmail.com\n"
+        <i>"upgautam@ualr.edu\n"</i>
+        <i>"infofuniversities@gmail.com\n"</i>
+        \n\n"
+
+        <b>" Final year Master project \n"</b>
+        "Comp. Sci. Dept, \n"
+        "Univ. of Arkansas at Little Rock\n"
+        "AR, 72204, USA\n"
         \n\n"
     </string>
-    <string name="action_settings">Settings</string>
 
 
 </resources>

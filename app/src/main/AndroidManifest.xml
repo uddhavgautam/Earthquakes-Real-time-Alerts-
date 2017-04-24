@@ -49,7 +49,7 @@
         android:name=".controller.utils.App"
         android:allowBackup="true"
         android:configChanges="orientation"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/title_activity"
         android:launchMode="singleTask"
         android:screenOrientation="portrait"

@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setSupportActionBar(mToolbar);
 //
 ////        set the logo icon
-        mToolbar.setLogo(R.drawable.icon1);
+        mToolbar.setLogo(R.mipmap.logo);
         getSupportActionBar().setSubtitle("Real-time Alerts!");
 
         AppSettings.setDefaultSettings(); //SingleFragmentActivity -- AppSettings -- other classes
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         tvEmptyMessage = (TextView) findViewById(R.id.tv_empty_message);
         tvBanner = (TextView) findViewById(R.id.mile_banner);
-        tvBanner.setText(" ");
+//        tvBanner.setText("");
         list = (ListView) findViewById(R.id.list2); //adds ListView in this, MainActivity. This list is for storing
         // earthquakes record in GUI
 
@@ -440,6 +440,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         EarthQuakes eq = (EarthQuakes) parent.getAdapter().getItem(position);
+        view.setSelected(true);
 
         if (CheckRiskEarthquakes.checkRisky(eq)) {
             Animator animator = Animator.getAnimator(tvBanner); //get the Animator to do the animation for tvBanner TextView
@@ -470,6 +471,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public boolean onItemLongClick(AdapterView<?> parent1, View view, int position, long id) {
         EarthQuakes eq = (EarthQuakes) parent1.getAdapter().getItem(position);
+        view.setSelected(true);
 
         if (CheckRiskEarthquakes.checkRisky(eq)) {
             Animator animator = Animator.getAnimator(tvBanner); //get the Animator to do the animation for tvBanner TextView

@@ -10,7 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/list_selector"
+        android:background="@drawable/bg_key"
         android:baselineAligned="false"
         android:clickable="false"
         android:divider="#000000"
