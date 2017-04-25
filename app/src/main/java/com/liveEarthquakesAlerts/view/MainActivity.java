@@ -40,6 +40,8 @@ import com.liveEarthquakesAlerts.controller.utils.SaveResponseToDB;
 import com.liveEarthquakesAlerts.controller.utils.broadcastReceiver.IncomingReceiver;
 import com.liveEarthquakesAlerts.model.LocationPOJO;
 import com.liveEarthquakesAlerts.model.database.EarthQuakes;
+import com.liveEarthquakesAlerts.model.database.LastTimeEarthquake;
+import com.liveEarthquakesAlerts.model.database.LastTimeRiskyEarthquakes;
 import com.squareup.otto.Subscribe;
 
 import java.util.List;
@@ -94,22 +96,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         AppSettings.setDefaultSettings(); //SingleFragmentActivity -- AppSettings -- other classes
 
-//        if (new LastTimeEarthquake().GetRowCount() == 0) { //if no earthquakes already in our database, then find total no of new records by querying JSON
-//            //checking just one earthquake record exists if enough to tell, this apk has previously synced the earthquakes
-//            LastTimeEarthquake led = new LastTimeEarthquake();
-//            //sets datemilis for any arbitrary record
-//            led.setDateMilis(606175200000l); //some date of 1989. This is starting datemilis
-//            Log.i("Datemilis", String.valueOf(led.getDateMilis()));
-//            led.Insert(); //this ultimately creates a earthquake row
-//            //this ensures the LastTimeEarthquake table is not null
-//        }
-//
-//        if (new LastTimeRiskyEarthquakes().GetRowCount() == 0) {
-//            LastTimeRiskyEarthquakes led = new LastTimeRiskyEarthquakes();
-//            led.setDateMilis(606175200000l);
-//            Log.i("Datemilis", String.valueOf(led.getDateMilis()));
-//            led.Insert();
-//        }
+        if (new LastTimeEarthquake().GetRowCount() == 0) { //if no earthquakes already in our database, then find total no of new records by querying JSON
+            //checking just one earthquake record exists if enough to tell, this apk has previously synced the earthquakes
+            LastTimeEarthquake led = new LastTimeEarthquake();
+            //sets datemilis for any arbitrary record
+            led.setDateMilis(606175200000l); //some date of 1989. This is starting datemilis
+            Log.i("Datemilis", String.valueOf(led.getDateMilis()));
+            led.Insert(); //this ultimately creates a earthquake row
+            //this ensures the LastTimeEarthquake table is not null
+        }
+
+        if (new LastTimeRiskyEarthquakes().GetRowCount() == 0) {
+            LastTimeRiskyEarthquakes led = new LastTimeRiskyEarthquakes();
+            led.setDateMilis(606175200000l);
+            Log.i("Datemilis", String.valueOf(led.getDateMilis()));
+            led.Insert();
+        }
 
         tvEmptyMessage = (TextView) findViewById(R.id.tv_empty_message);
         tvBanner = (TextView) findViewById(R.id.mile_banner);

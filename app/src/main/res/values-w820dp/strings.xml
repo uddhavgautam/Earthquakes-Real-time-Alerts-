@@ -49,11 +49,11 @@
 \n\n
 
 
-About\n
+<b>About\n</b>
 This is a tool which provides you real-time earthquakes alerts. It has the features which can send the automated text messages for your emergency contacts too. After messages get sent to emergency contacts, there comes floating action button, which on tap responses “I am Ok” message to your emergency contacts.
 \n\n\n\n\n
 
-Procedures\n
+<b>Procedures\n</b>
 
 Main Screen shows real-time earthquakes based on your settings.
 
@@ -78,10 +78,16 @@ Main Screen shows real-time earthquakes based on your settings.
     </string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="large_textt">
-        "About Developer\n\n"
+        <b>"About Developer \n"</b>
         "Uddhav Gautam\n"
-        "upgautam@ualr.edu\n"
-        "infofuniversities@gmail.com\n"
+        <i>"upgautam@ualr.edu\n"</i>
+        <i>"infofuniversities@gmail.com\n"</i>
+        \n\n"
+
+        <b>" Final year Master project \n"</b>
+        "Comp. Sci. Dept, \n"
+        "Univ. of Arkansas at Little Rock\n"
+        "AR, 72204, USA\n"
         \n\n"
     </string>
 
