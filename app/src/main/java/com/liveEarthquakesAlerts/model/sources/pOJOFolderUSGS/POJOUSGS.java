@@ -8,13 +8,9 @@ import java.util.List;
 public class POJOUSGS<String, M, F, Float> {
 
     private String type;
-    private M metadata; //added MetadataUSGS as M type generic. M becomes MetadataUSGS when
-    //I call                         POJOUSGS<String, MetadataUSGS, FeaturesUSGS<PropertiesUSGS, GeometryUSGS>, Float> items = gson.fromJson(jsonOriginal, listType);
-//  where listType is as:            final Type listType = new TypeToken<POJOUSGS<String, MetadataUSGS, FeaturesUSGS<PropertiesUSGS, GeometryUSGS>, Float>>() {
-
+    private M metadata;
     private List<F> features; //added FeaturesUSGS as List of F type.
     private List<Float> bbox;
-
 
     public List<Float> getBbox() {
         return bbox;

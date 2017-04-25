@@ -44,7 +44,6 @@ import com.liveEarthquakesAlerts.controller.utils.CheckRiskEarthquakes;
 import com.liveEarthquakesAlerts.controller.utils.MyOwnCustomLog;
 import com.liveEarthquakesAlerts.model.LocationPOJO;
 import com.liveEarthquakesAlerts.model.database.EarthQuakes;
-import com.liveEarthquakesAlerts.model.database.LastEarthquakeDate;
 import com.liveEarthquakesAlerts.model.database.RiskyEarthquakes;
 import com.liveEarthquakesAlerts.view.MainActivity;
 import com.odoo.FavoriteNumberBean;
@@ -271,6 +270,8 @@ public class LocTrackService extends Service
             }
         }
 
+        //track the most risky earthquake
+
         for (RiskyEarthquakes r : allRiskyEarthquakes) {
             while (CheckRiskEarthquakes.checkRisky(r)) {
                 //Notify user
@@ -302,7 +303,7 @@ public class LocTrackService extends Service
 
             }
 
-            LastEarthquakeDate led = new LastEarthquakeDate();
+            LastTimeEarthquake led = new LastTimeEarthquake();
             led.setDateMilis(new EarthQuakes().GetLastEarthQuakeDate());
             led.Insert();
         }

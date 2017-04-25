@@ -85,8 +85,6 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
 
 //                        Log.i("Jsonoriginal", jsonOriginal);
                 items = gson.fromJson(jsonOriginal, listType);
-
-
                 if (items == null || items.getFeatures() == null || items.getFeatures().size() == 0) { //check if item null or items' FeaturesUSGS null or item's FeaturesUSGS empty
                     return;
                 }

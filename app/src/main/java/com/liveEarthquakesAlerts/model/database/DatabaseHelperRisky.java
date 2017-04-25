@@ -24,7 +24,7 @@ public class DatabaseHelperRisky extends OrmLiteSqliteOpenHelper {
     private static Object syncObject = new Object();
     private final Context myContext;
     private Dao<RiskyEarthquakes, Long> EarthQuakesDataHelperRisky = null;
-    private Dao<LastEarthquakeDateRisky, Integer> LastEarthquakeDateDataHelperRisky = null;
+    private Dao<LastTimeRiskyEarthquakes, Integer> LastEarthquakeDateDataHelperRisky = null;
 
     public DatabaseHelperRisky(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -44,7 +44,7 @@ public class DatabaseHelperRisky extends OrmLiteSqliteOpenHelper {
     public void onCreate(SQLiteDatabase db, ConnectionSource connectionSource) {
         try {
             TableUtils.createTable(connectionSource, RiskyEarthquakes.class);
-            TableUtils.createTable(connectionSource, LastEarthquakeDateRisky.class);
+            TableUtils.createTable(connectionSource, LastTimeRiskyEarthquakes.class);
         } catch (java.sql.SQLException e) {
             OnLineTracker.catchException(e);
         }
@@ -54,7 +54,7 @@ public class DatabaseHelperRisky extends OrmLiteSqliteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
         try {
             TableUtils.dropTable(connectionSource, RiskyEarthquakes.class, true);
-            TableUtils.dropTable(connectionSource, LastEarthquakeDateRisky.class, true);
+            TableUtils.dropTable(connectionSource, LastTimeRiskyEarthquakes.class, true);
             onCreate(db, connectionSource);
         } catch (java.sql.SQLException e) {
             OnLineTracker.catchException(e);
@@ -77,9 +77,9 @@ public class DatabaseHelperRisky extends OrmLiteSqliteOpenHelper {
         return EarthQuakesDataHelperRisky;
     }
 
-    public Dao<LastEarthquakeDateRisky, Integer> getLastEarthquakeDateDataHelperRisky() throws SQLException {
+    public Dao<LastTimeRiskyEarthquakes, Integer> getLastEarthquakeDateDataHelperRisky() throws SQLException {
         if (LastEarthquakeDateDataHelperRisky == null) {
-            LastEarthquakeDateDataHelperRisky = getDao(LastEarthquakeDateRisky.class);
+            LastEarthquakeDateDataHelperRisky = getDao(LastTimeRiskyEarthquakes.class);
         }
         return LastEarthquakeDateDataHelperRisky;
     }

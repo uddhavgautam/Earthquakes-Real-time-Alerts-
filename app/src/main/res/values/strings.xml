@@ -3,7 +3,7 @@
 <resources>
 
     <string name="app_name">EarthquakesNotificationTool</string>
-    <string name="title_activity">Real-time Earthquakes</string>
+    <string name="title_activity">Earthquakes Real-time Alerts!</string>
     <string name="EarthquakesDetect">Earthquake Detected!</string>
     <string name="NoConnection">Internet connection was not found!</string>
     <string name="MapCanNotBeDisplayed">Map can not be displayed</string>
@@ -49,11 +49,11 @@
 \n\n
 
 
-About\n
+<b>About\n</b>
 This is a tool which provides you real-time earthquakes alerts. It has the features which can send the automated text messages for your emergency contacts too. After messages get sent to emergency contacts, there comes floating action button, which on tap responses “I am Ok” message to your emergency contacts.
 \n\n\n\n\n
 
-Procedures\n
+<b>Procedures\n</b>
 
 Main Screen shows real-time earthquakes based on your settings.
 

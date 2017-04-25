@@ -3,7 +3,7 @@
 <resources>
 
     <string name="app_name">EarthquakesNotificationTool</string>
-    <string name="title_activity">Real-time Earthquakes</string>
+    <string name="title_activity">Earthquakes Real-time Alerts!</string>
     <string name="EarthquakesDetect">Earthquake Detected!</string>
     <string name="NoConnection">Internet connection was not found!</string>
     <string name="MapCanNotBeDisplayed">Map can not be displayed</string>
