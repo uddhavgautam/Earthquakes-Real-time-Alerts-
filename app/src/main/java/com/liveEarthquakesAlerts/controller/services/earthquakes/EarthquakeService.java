@@ -49,7 +49,8 @@ public class EarthquakeService extends Service {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (OnLineTracker.isOnline(getApplicationContext())) { //check every time online
                     SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
-                    clientHelper.getDataFromFirebase(dataSnapshot);
+//                    clientHelper.getDataFromFirebase(dataSnapshot); //makes download data from Firebase
+                    clientHelper.getDataFromUSGS();
 
                 } else {
                     App.bus.post(new BusStatus(999));
@@ -72,7 +73,8 @@ public class EarthquakeService extends Service {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (OnLineTracker.isOnline(getApplicationContext())) { //check every time online
                     SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
-                    clientHelper.getPartialDataFromFirebase(dataSnapshot);
+//                    clientHelper.getPartialDataFromFirebase(dataSnapshot); //downloads data from Firebase
+                    clientHelper.getPartialDataFromUSGS();
 
                 } else {
                     App.bus.post(new BusStatus(999));
@@ -85,36 +87,35 @@ public class EarthquakeService extends Service {
             }
         };
 
-        referenceEarthquakes.addValueEventListener(valueEventListenerEarthquake);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        referenceEarthquakes = FirebaseDatabase.getInstance().getReference().getRoot().child("realTimeEarthquakes");
-
-
-
-        Thread thdsds = new Thread(new Runnable() { //UI thread is not getting blocked
+//        referenceEarthquakes = FirebaseDatabase.getInstance().getReference().getRoot().child("realTimeEarthquakes");
+        referenceEarthquakes = FirebaseDatabase.getInstance().getReference().getRoot().child("serverTrack").child("metaInfo");
+//metaInfo changes on every Firebase Update
+        Thread wrapperThread = new Thread(new Runnable() { //UI thread is not getting blocked
             @Override
             public void run() {
-                int counttt = 0;
-
                 while (true) {
-
-                    Thread thsdfdsfds = new Thread(new Runnable() {
+                    Thread insideThread = new Thread(new Runnable() {
 
                         @Override
                         public void run() {
                             //before fetching check if real-time database has not been deleted since after you initialized
-                            String myVarData = SaveResponseToDB.getFirebaseWholeData("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes.json?print=pretty");
+                            String myVarData = SaveResponseToDB.checkIfFirebaseHasData("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes.json?print=pretty");
+                            Log.i("myVarData", "\"" + myVarData + "\"" + " hello gautam! " + myVarData.equals(null));
                             if ((!myVarData.equals("null"))) { //realtime db already exists
-                                if (AppSettings.getInstance().getProximity() == 0)
-                                fetchFromFirebase(); //if data changed then it fetches the earthquakes automatically
-                                else
-                                    fetchPartialDataFromFirebase(); //if data changed then it fetches the earthquakes automatically
-
-
+                                if (AppSettings.getInstance().getProximity() == 0) {
+//                                    fetchFromFirebase(); //if data changed then it fetches the earthquakes automatically
+                                    Log.i("fullfetch", "dlfjs");
+                                    fetchFromUSGS();
+                                } else {
+//                                    fetchPartialDataFromFirebase(); //if data changed then it fetches the earthquakes automatically
+                                    Log.i("Partialfetch", "dlfjs");
+                                    fetchPartialDataFromUSGS();
+                                }
                                 firebaseTime = getFirebaseTimeUsingCurl();
                                 if (((new Date().getTime()) - firebaseTime) > 11000) {
                                     SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGSAlwaysFullUpdate(), FirebaseDatabase.getInstance().getReference().getRoot());
@@ -131,25 +132,48 @@ public class EarthquakeService extends Service {
                             }
                         }
                     });
-
                     try {
-                        thsdfdsfds.start();
+                        insideThread.start();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
 
                     try {
-                        Thread.sleep(21000);
+                        Thread.sleep(11000); //11 seconds //Let's change it to 51 seconds (doing this optimizes my processor), because millions of clients update this.
+                        //When they update, I get the new data.
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             }
         });
-        thdsds.setPriority(Thread.MAX_PRIORITY);
-        thdsds.start();
+        wrapperThread.setPriority(Thread.MAX_PRIORITY);
+        wrapperThread.start();
 
         return START_STICKY;
+    }
+
+    private void fetchPartialDataFromUSGS() {
+
+        if (OnLineTracker.isOnline(getApplicationContext())) { //check every time online
+            SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
+//                    clientHelper.getPartialDataFromFirebase(dataSnapshot); //downloads data from Firebase
+            clientHelper.getPartialDataFromUSGS();
+
+        } else {
+            App.bus.post(new BusStatus(999));
+        }
+    }
+
+    private void fetchFromUSGS() {
+        if (OnLineTracker.isOnline(getApplicationContext())) { //check every time online
+            SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
+//                    clientHelper.getDataFromUSGS(dataSnapshot); //downloads data from Firebase
+            clientHelper.getDataFromUSGS();
+
+        } else {
+            App.bus.post(new BusStatus(999));
+        }
     }
 
     private long getFirebaseTimeUsingCurl() {
@@ -159,14 +183,16 @@ public class EarthquakeService extends Service {
         try {
             Response response = new OkHttpClient().newCall(request).execute(); //OkHttpClient is HTTP client to request
             String[] str = response.body().string().split("\\n"); //because it prints with newline character with it
-            Log.i("myLong", str[0]);
-
-            myLong = Long.parseLong(str[0]);
-            Log.i("myLong", myLong + "");
+            for (String sttsf : str) {
+                Log.i("strsfdas", sttsf);
+            }
+//            Log.i("myLong", str[0]);
+//            myLong = Long.parseLong(str[0]);
+//            Log.i("myLong", myLong + "");
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return myLong;
+        return 234l;
 
     }
 

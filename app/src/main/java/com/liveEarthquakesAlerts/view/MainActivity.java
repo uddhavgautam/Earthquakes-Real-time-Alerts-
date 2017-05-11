@@ -40,7 +40,7 @@ import com.liveEarthquakesAlerts.controller.utils.SaveResponseToDB;
 import com.liveEarthquakesAlerts.controller.utils.broadcastReceiver.IncomingReceiver;
 import com.liveEarthquakesAlerts.model.LocationPOJO;
 import com.liveEarthquakesAlerts.model.database.EarthQuakes;
-import com.liveEarthquakesAlerts.model.database.LastTimeEarthquake;
+import com.liveEarthquakesAlerts.model.database.LastTimeEarthquakes;
 import com.liveEarthquakesAlerts.model.database.LastTimeRiskyEarthquakes;
 import com.squareup.otto.Subscribe;
 
@@ -91,19 +91,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setSupportActionBar(mToolbar);
 //
 ////        set the logo icon
-        mToolbar.setLogo(R.mipmap.logo);
+        mToolbar.setLogo(R.drawable.ic_launcher);
         getSupportActionBar().setSubtitle("Real-time Alerts!");
 
         AppSettings.setDefaultSettings(); //SingleFragmentActivity -- AppSettings -- other classes
 
-        if (new LastTimeEarthquake().GetRowCount() == 0) { //if no earthquakes already in our database, then find total no of new records by querying JSON
+        if (new LastTimeEarthquakes().GetRowCount() == 0) { //if no earthquakes already in our database, then find total no of new records by querying JSON
             //checking just one earthquake record exists if enough to tell, this apk has previously synced the earthquakes
-            LastTimeEarthquake led = new LastTimeEarthquake();
+            LastTimeEarthquakes led = new LastTimeEarthquakes();
             //sets datemilis for any arbitrary record
             led.setDateMilis(606175200000l); //some date of 1989. This is starting datemilis
             Log.i("Datemilis", String.valueOf(led.getDateMilis()));
             led.Insert(); //this ultimately creates a earthquake row
-            //this ensures the LastTimeEarthquake table is not null
+            //this ensures the LastTimeEarthquakes table is not null
         }
 
         if (new LastTimeRiskyEarthquakes().GetRowCount() == 0) {
@@ -157,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void initializeFirebaseRealtimeDB() {
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot();
-        Log.i("DbReference", databaseReference + "");
 
         Thread newThread = new Thread(new Runnable() {
             @Override
@@ -166,11 +165,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 //Note: Firebase writes "null" string for null
 
-                //below myVarData can throw null\n. Please remember this
-                String myVarData = SaveResponseToDB.getFirebaseWholeData("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes.json?print=pretty");
+                String myVarData = SaveResponseToDB.checkIfFirebaseHasData("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes.json?print=pretty");
                 Log.i("myVarData", "\"" + myVarData + "\"" + " hello gautam! " + myVarData.equals(null));
                 if ((!myVarData.equals("null"))) { //realtime db already exists
-                    Log.i("else", "inside elsewer, realtime DB already exists");
 //                    create Firebase Realtime DB jsonOriginal structure and upload earthquake JSON
                     SaveResponseToDB.isInitialized = true;
                     broadcastIntent.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("isInitializedAlready", SaveResponseToDB.isInitialized);
@@ -178,7 +175,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
                 } else {
-                    Log.i("else", "no real time db");
+                    Log.i("StatusCodee2", myVarData + "");
+
                     SaveResponseToDB.isInitialized = false;//initialized but not properly. Therefore isInitialized = false
                     SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
                     SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGSAlwaysFullUpdate(), databaseReference);
@@ -208,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         broadcastIntent.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("LocationPermissionAlready", true);
                         sendBroadcast(broadcastIntent);
 
-                    } else { // if user doen't enable location settings
+                    } else { // if user does not enable location settings
 
                         broadcastIntent.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("LocationPermissionAlready", false);
                         sendBroadcast(broadcastIntent);

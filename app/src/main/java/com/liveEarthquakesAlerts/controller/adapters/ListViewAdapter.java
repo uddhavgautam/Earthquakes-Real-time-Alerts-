@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.liveEarthquakesAlerts.R;
 import com.liveEarthquakesAlerts.model.database.EarthQuakes;
 
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -46,8 +46,21 @@ public class ListViewAdapter extends ArrayAdapter<EarthQuakes> { // just to GUI 
 
         EarthQuakes earthQuake = list.get(position);
         tvLocation.setText(earthQuake.getLocationName());
-        DateFormat format = DateFormat.getDateInstance();
-        tvDate.setText(": " + format.format(new Date(earthQuake.getDateMilis())));
+        Long milis = earthQuake.getDateMilis();
+
+//        DateFormat format = DateFormat.getDateInstance();
+//        String date = format.format(milis);
+//        long x = milis / 1000;
+//        long seconds = x % 60;
+//        x /= 60;
+//        long minutes = x % 60;
+//        x /= 60;
+//        long hours = x % 24;
+
+        SimpleDateFormat format = new SimpleDateFormat("MMMM dd, yyyy hh:mm:ss a",
+                java.util.Locale.getDefault());
+
+        tvDate.setText(": " + format.format(new Date(milis)));
         tvDepth.setText(": " + Float.toString(earthQuake.getDepth()) + " KM");
         tvMag.setText(Float.toString(earthQuake.getMagnitude()));
 

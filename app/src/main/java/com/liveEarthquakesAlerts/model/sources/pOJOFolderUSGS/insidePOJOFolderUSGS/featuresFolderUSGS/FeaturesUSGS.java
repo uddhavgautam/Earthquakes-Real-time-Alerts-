@@ -8,18 +8,18 @@ public class FeaturesUSGS<P, G> { //generic representation. Two different generi
     // Each feature means each earthquake.
     // Generic is only for object, not for primitive types
 
-    private String type;
+    //    private String type;
     private P properties; //added PropertiesUSGS as first generic type
     private G geometry; //added GeometryUSGS as second generic type
     private String id;
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
+//    public String getType() {
+//        return type;
+//    }
+//
+//    public void setType(String type) {
+//        this.type = type;
+//    }
 
     public P getProperties() {
         return properties;

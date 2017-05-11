@@ -44,6 +44,7 @@ import com.liveEarthquakesAlerts.controller.utils.CheckRiskEarthquakes;
 import com.liveEarthquakesAlerts.controller.utils.MyOwnCustomLog;
 import com.liveEarthquakesAlerts.model.LocationPOJO;
 import com.liveEarthquakesAlerts.model.database.EarthQuakes;
+import com.liveEarthquakesAlerts.model.database.LastTimeEarthquakes;
 import com.liveEarthquakesAlerts.model.database.RiskyEarthquakes;
 import com.liveEarthquakesAlerts.view.MainActivity;
 import com.odoo.FavoriteNumberBean;
@@ -303,7 +304,7 @@ public class LocTrackService extends Service
 
             }
 
-            LastTimeEarthquake led = new LastTimeEarthquake();
+            LastTimeEarthquakes led = new LastTimeEarthquakes();
             led.setDateMilis(new EarthQuakes().GetLastEarthQuakeDate());
             led.Insert();
         }

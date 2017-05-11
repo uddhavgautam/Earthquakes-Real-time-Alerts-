@@ -195,7 +195,7 @@ public class RiskyEarthquakes implements Parcelable, Comparator<RiskyEarthquakes
             qBuilder.distinct().where()
                     .gt("Magnitude", AppSettings.getInstance().getMagnitude()) //
                     .and()//
-                    .gt("DateMilis", new LastTimeEarthquake().GetLastEarthquakeMilisDate());
+                    .gt("DateMilis", new LastTimeEarthquakes().GetLastEarthquakeMilisDate());
 
 
             qBuilder.orderBy("DateMilis", false);

@@ -15,18 +15,18 @@ import java.util.Comparator;
  * Created by uddhav Gautam on 7.3.2016. upgautam@ualr.edu
  */
 
-@DatabaseTable(tableName = "LastTimeEarthquake")
-public class LastTimeEarthquake implements Parcelable, Comparator<LastTimeEarthquake> {
+@DatabaseTable(tableName = "LastTimeEarthquakes")
+public class LastTimeEarthquakes implements Parcelable, Comparator<LastTimeEarthquakes> {
 
-    public static final Creator<LastTimeEarthquake> CREATOR = new Creator<LastTimeEarthquake>() {
+    public static final Creator<LastTimeEarthquakes> CREATOR = new Creator<LastTimeEarthquakes>() {
         @Override
-        public LastTimeEarthquake createFromParcel(Parcel in) {
-            return new LastTimeEarthquake(in);
+        public LastTimeEarthquakes createFromParcel(Parcel in) {
+            return new LastTimeEarthquakes(in);
         }
 
         @Override
-        public LastTimeEarthquake[] newArray(int size) {
-            return new LastTimeEarthquake[size];
+        public LastTimeEarthquakes[] newArray(int size) {
+            return new LastTimeEarthquakes[size];
         }
     };
     @DatabaseField(id = true)
@@ -34,19 +34,19 @@ public class LastTimeEarthquake implements Parcelable, Comparator<LastTimeEarthq
     @DatabaseField
     private Long DateMilis;
 
-    public LastTimeEarthquake() {
+    public LastTimeEarthquakes() {
         this.id = 1;
     }
 
-    protected LastTimeEarthquake(Parcel in) {
+    protected LastTimeEarthquakes(Parcel in) {
         id = in.readInt();
     }
 
     public void Insert() {
 
         try {
-            Dao<LastTimeEarthquake, Integer> Missionsinsert = (DatabaseHelper.getDbHelper()).getLastEarthquakeDateDataHelper();
-            LastTimeEarthquake existenceCheck = Missionsinsert.queryForId(this.id);
+            Dao<LastTimeEarthquakes, Integer> Missionsinsert = (DatabaseHelper.getDbHelper()).getLastEarthquakeDateDataHelper();
+            LastTimeEarthquakes existenceCheck = Missionsinsert.queryForId(this.id);
 
             if (existenceCheck != null) {
                 Missionsinsert.update(this);
@@ -60,9 +60,9 @@ public class LastTimeEarthquake implements Parcelable, Comparator<LastTimeEarthq
     }
 
     public Long GetLastEarthquakeMilisDate() {
-        LastTimeEarthquake lastDate = null;
+        LastTimeEarthquakes lastDate = null;
         try {
-            Dao<LastTimeEarthquake, Integer> dao = DatabaseHelper.getDbHelper().getLastEarthquakeDateDataHelper();
+            Dao<LastTimeEarthquakes, Integer> dao = DatabaseHelper.getDbHelper().getLastEarthquakeDateDataHelper();
             lastDate = dao.queryForId(1);
         } catch (Exception e) {
             OnLineTracker.catchException(e);
@@ -74,7 +74,7 @@ public class LastTimeEarthquake implements Parcelable, Comparator<LastTimeEarthq
         int count = 0;
 
         try {
-            Dao<LastTimeEarthquake, Integer> dao = DatabaseHelper.getDbHelper().getLastEarthquakeDateDataHelper();
+            Dao<LastTimeEarthquakes, Integer> dao = DatabaseHelper.getDbHelper().getLastEarthquakeDateDataHelper();
             count = (int) dao.countOf();
         } catch (Exception e) {
             OnLineTracker.catchException(e);
@@ -113,7 +113,7 @@ public class LastTimeEarthquake implements Parcelable, Comparator<LastTimeEarthq
     }
 
     @Override
-    public int compare(LastTimeEarthquake lhs, LastTimeEarthquake rhs) {
+    public int compare(LastTimeEarthquakes lhs, LastTimeEarthquakes rhs) {
         return (int) (lhs.DateMilis - rhs.DateMilis);
     }
 

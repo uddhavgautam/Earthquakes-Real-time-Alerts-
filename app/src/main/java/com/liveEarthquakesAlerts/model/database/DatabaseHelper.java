@@ -23,7 +23,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static Object syncObject = new Object();
     private final Context myContext;
     private Dao<EarthQuakes, Long> EarthQuakesDataHelper = null;
-    private Dao<LastTimeEarthquake, Integer> LastEarthquakeDateDataHelper = null;
+    private Dao<LastTimeEarthquakes, Integer> LastEarthquakeDateDataHelper = null;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -43,7 +43,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     public void onCreate(SQLiteDatabase db, ConnectionSource connectionSource) {
         try {
             TableUtils.createTable(connectionSource, EarthQuakes.class);
-            TableUtils.createTable(connectionSource, LastTimeEarthquake.class);
+            TableUtils.createTable(connectionSource, LastTimeEarthquakes.class);
         } catch (java.sql.SQLException e) {
             OnLineTracker.catchException(e);
         }
@@ -53,7 +53,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
         try {
             TableUtils.dropTable(connectionSource, EarthQuakes.class, true);
-            TableUtils.dropTable(connectionSource, LastTimeEarthquake.class, true);
+            TableUtils.dropTable(connectionSource, LastTimeEarthquakes.class, true);
             onCreate(db, connectionSource);
         } catch (java.sql.SQLException e) {
             OnLineTracker.catchException(e);
@@ -76,9 +76,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return EarthQuakesDataHelper;
     }
 
-    public Dao<LastTimeEarthquake, Integer> getLastEarthquakeDateDataHelper() throws SQLException {
+    public Dao<LastTimeEarthquakes, Integer> getLastEarthquakeDateDataHelper() throws SQLException {
         if (LastEarthquakeDateDataHelper == null) {
-            LastEarthquakeDateDataHelper = getDao(LastTimeEarthquake.class);
+            LastEarthquakeDateDataHelper = getDao(LastTimeEarthquakes.class);
         }
         return LastEarthquakeDateDataHelper;
     }
