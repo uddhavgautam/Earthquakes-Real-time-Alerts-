@@ -186,7 +186,6 @@ public class LocTrackService extends Service
                 }
             }
         } else {
-            Log.i(TAG, "inside thread of sfasdfafas null GoogleApiClient !");
             Log.i(TAG, "GoogleApiClient couldn't build!");
         }
 

@@ -23,8 +23,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.liveEarthquakesAlerts.R;
 import com.liveEarthquakesAlerts.controller.adapters.ListViewAdapter;
 import com.liveEarthquakesAlerts.controller.services.locations.LocTrackService;
@@ -44,17 +47,23 @@ import com.liveEarthquakesAlerts.model.database.LastTimeEarthquakes;
 import com.liveEarthquakesAlerts.model.database.LastTimeRiskyEarthquakes;
 import com.squareup.otto.Subscribe;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Created by  Uddhav Gautam  on 7.3.2016. upgautam@ualr.edu
  */
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener, OnScrollListener {
 
+    public static final DatabaseReference realTimeEarthquakes = FirebaseDatabase.getInstance().getReference().getRoot().child("realTimeEarthquakes");
     public static String bannerText;
     public static Intent locInitServiceIntent;
     public static boolean isRegistered = false;
     public static Intent broadcastIntent = new Intent();
+    public static String modifiedCheckTime;
     private static IncomingReceiver incomingReceiver;
     private final String TAG = "MainActivity";
     private ProgressDialog pd;
@@ -66,9 +75,52 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private boolean isConnectToInternet = true;
     private MyOwnCustomLog myOwnCustomLog = new MyOwnCustomLog();
 
+    public static void FirebaseSync(final Context context, DatabaseReference realTimeEarthquakes) {
+        final ValueEventListener valueEventListenerEarthquake = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                try {
+                    if (OnLineTracker.isOnline(context)) {
+                        if (AppSettings.getInstance().getProximity() == 0) {
+                            Log.i("FirebaseDb", " World-wide");
+                            SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
+                            clientHelper.getDataFromUSGSCalledFromDataListener();
+
+                        } else { //user-proximity
+                            Log.i("FirebaseDb", " User-proximity");
+                            SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
+                            clientHelper.getPartialDataFromUSGSCalledFromDataListener();
+                        }
+                    } else {
+                        App.bus.post(new BusStatus(999));
+                    }
+                } catch (Exception e) {
+                    OnLineTracker.catchException(e);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        };
+
+        realTimeEarthquakes.addValueEventListener(valueEventListenerEarthquake);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        SimpleDateFormat dateFormat2 = new SimpleDateFormat("E',' dd MMM yyyy kk:mm:ss 'GMT'"); //instead of hh, use kk for 24 hours format
+        TimeZone timeZone2 = TimeZone.getTimeZone("GMT");
+        dateFormat2.setTimeZone(timeZone2);
+        Calendar cal1 = Calendar.getInstance(timeZone2);
+        cal1.add(Calendar.MINUTE, -1000); //get time of 1000 minutes before
+        Date dateBeforeTenMinute2 = cal1.getTime();
+        modifiedCheckTime = dateFormat2.format(dateBeforeTenMinute2); //current GMT time of 10 minutes before
+        Log.i("ModifiedTm ", MainActivity.modifiedCheckTime);
+
 
         SaveResponseToDB saveResponseToDB = new SaveResponseToDB(this); //pass the context. Don't use static, it will leak the memory
         LocTrackService locTrackService = new LocTrackService(this); //pass the context
@@ -101,7 +153,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             LastTimeEarthquakes led = new LastTimeEarthquakes();
             //sets datemilis for any arbitrary record
             led.setDateMilis(606175200000l); //some date of 1989. This is starting datemilis
-            Log.i("Datemilis", String.valueOf(led.getDateMilis()));
             led.Insert(); //this ultimately creates a earthquake row
             //this ensures the LastTimeEarthquakes table is not null
         }
@@ -109,7 +160,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (new LastTimeRiskyEarthquakes().GetRowCount() == 0) {
             LastTimeRiskyEarthquakes led = new LastTimeRiskyEarthquakes();
             led.setDateMilis(606175200000l);
-            Log.i("Datemilis", String.valueOf(led.getDateMilis()));
             led.Insert();
         }
 
@@ -123,23 +173,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         list.setOnScrollListener(this);
         list.setOnItemClickListener(this);
 
-        //make sure firebase realtime DB initialized completed. Why? Because as LocTrackService gets the location
-        //I start fetching from firebase. There I create reference. If I don't have already initialized, then it throws null pointer
-        //exception on those references
         locInitServiceIntent = new Intent(this, LocTrackService.class);
-
-
-        //main thread should not be blocked. Therefore, two solutions here:
-        //1) Either I create another thread and run startService(locInitServiceIntent) from there. Make the created thread never dies and listen from the thread when I updated firebase database
-        //2) BroadcastReceiver. Since there is chain like "main thread> another threadX > main therad > another thread> another thread> main thread> another threadZ. Our situation is like communication threadX and threadZ.
 
         incomingReceiver = new IncomingReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.i("Intentmy", intent.getBooleanExtra("LocationPermissionAlready", false) + "");
-                if (intent.getBooleanExtra("isInitializedAlready", false) && intent.getBooleanExtra("LocationPermissionAlready", false)) { //it means already initialized
-                    Log.i(TAG, "Successfully loctracking service is triggered!");
-
+                if (intent.getBooleanExtra("isInitializedAlready", false /* default value */) && intent.getBooleanExtra("LocationPermissionAlready", false)) { //it means already initialized
+                    Log.i("Broadcast", " receiver executed!");
                     startService(locInitServiceIntent);
                 }
             }
@@ -154,34 +194,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
-
-    private void initializeFirebaseRealtimeDB() {
+    private void initializeFirebaseRealtimeDB() { //onStart() calling this
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot();
 
         Thread newThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                //if there is data. Don't do null checking using "==" operator. This understanding is wrong
-
-                //Note: Firebase writes "null" string for null
 
                 String myVarData = SaveResponseToDB.checkIfFirebaseHasData("https://earthquakesenotifications.firebaseio.com/realTimeEarthquakes.json?print=pretty");
-                Log.i("myVarData", "\"" + myVarData + "\"" + " hello gautam! " + myVarData.equals(null));
-                if ((!myVarData.equals("null"))) { //realtime db already exists
-//                    create Firebase Realtime DB jsonOriginal structure and upload earthquake JSON
+                if ((!myVarData.equals("null"))) { //database in Firebase exists
+                    Log.i("Initialize", " Firebase Database data exists!");
+                    FirebaseSync(getApplicationContext(), realTimeEarthquakes);
                     SaveResponseToDB.isInitialized = true;
                     broadcastIntent.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("isInitializedAlready", SaveResponseToDB.isInitialized);
                     sendBroadcast(broadcastIntent);
 
-
                 } else {
-                    Log.i("StatusCodee2", myVarData + "");
-
-                    SaveResponseToDB.isInitialized = false;//initialized but not properly. Therefore isInitialized = false
-                    SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
-                    SaveResponseToDB.updateFirebase(CreateRequestUrl.URL_USGSAlwaysFullUpdate(), databaseReference);
+                    Log.i("Initialize", " Firebase Database data doesn't exists!");
+                    SaveResponseToDB.isInitialized = false;
+                    SaveResponseToDB.DoFirebaseUpdateOnNeed(SaveResponseToDB.isInitialized, CreateRequestUrl.requestUSGSUsingHttp(), databaseReference);
                 }
-
             }
         });
         newThread.start();
@@ -234,28 +266,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.i("shdlfsdkfjkdj", "if");
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 99);
         } else {
-            Log.i("shdlfsdkfjkdj", "else");
             broadcastIntent.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("LocationPermissionAlready", true);
             sendBroadcast(broadcastIntent);
-
         }
 
-
-        //second work: update JSON from USGS to Firebase
         initializeFirebaseRealtimeDB(); //completed
 
         App.bus.register(this);
 
-//        pd = new ProgressDialog(MainActivity.this); //show progressbar
-//        pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-//        pd.setTitle(getString(R.string.PleaseWait));
-//        pd.setMessage(getString(R.string.DatasLoading));
-//        pd.setCancelable(true);
-//        pd.setIndeterminate(true);
-//        pd.show();
+        pd = new ProgressDialog(MainActivity.this); //show progressbar
+        pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        pd.setTitle(getString(R.string.PleaseWait));
+        pd.setMessage(getString(R.string.DataLoading));
+        pd.setCancelable(true);
+        pd.setIndeterminate(true);
+        pd.show();
     }
 
     @Override
@@ -295,8 +322,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             isConnectToInternet = false;
             list.setEmptyView(tvEmptyMessage);
             list.setAdapter(null);
-        } else {
-
+        } else if (event.getStatus() == 1234) {
+            broadcastIntent.setAction("SaveResponseToDB.isInitialized.Uddhav").putExtra("isInitializedAlready", SaveResponseToDB.isInitialized);
+            sendBroadcast(broadcastIntent);
+        } else if (event.getStatus() == 123) {
 
 
 //update the adapter
@@ -328,11 +357,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 //        stop the progress bar
 
-//        if (pd != null && pd.isShowing()) {
-//            Log.i("Inside pd", "pd is running");
-//            pd.dismiss();
-//            pd = null;
-//        }
+        if (pd != null && pd.isShowing()) {
+            Log.i("Inside pd", "pd is running");
+            pd.dismiss();
+            pd = null;
+        }
     }
 
     @Override

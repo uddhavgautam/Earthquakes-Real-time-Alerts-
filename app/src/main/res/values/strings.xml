@@ -90,6 +90,8 @@ Main Screen shows real-time earthquakes based on your settings.
         "AR, 72204, USA\n"
         \n\n"
     </string>
+    <string name="PleaseWait">\"PLEASE WAIT..\"</string>
+    <string name="DataLoading">\"LOADING..\"</string>
 
 
 </resources>

@@ -7,7 +7,7 @@ public class MetadataUSGS {
 
     private long generated;
     //    private String url;
-    private String title;
+//    private String title;
 //    private int status;
 //    private String api;
 //    private int count;
@@ -19,13 +19,13 @@ public class MetadataUSGS {
     public void setGenerated(long generated) {
         this.generated = generated;
     }
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
+//    public String getTitle() {
+//        return title;
+//    }
+//
+//    public void setTitle(String title) {
+//        this.title = title;
+//    }
 
 //    public String getUrl() {
 //        return url;
