@@ -276,13 +276,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         App.bus.register(this);
 
-        pd = new ProgressDialog(MainActivity.this); //show progressbar
-        pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        pd.setTitle(getString(R.string.PleaseWait));
-        pd.setMessage(getString(R.string.DataLoading));
-        pd.setCancelable(true);
-        pd.setIndeterminate(true);
-        pd.show();
+//        pd = new ProgressDialog(MainActivity.this); //show progressbar
+//        pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+//        pd.setTitle(getString(R.string.PleaseWait));
+//        pd.setMessage(getString(R.string.DataLoading));
+//        pd.setCancelable(true);
+//        pd.setIndeterminate(true);
+//        pd.show();
     }
 
     @Override
@@ -357,11 +357,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 //        stop the progress bar
 
-        if (pd != null && pd.isShowing()) {
-            Log.i("Inside pd", "pd is running");
-            pd.dismiss();
-            pd = null;
-        }
+//        if (pd != null && pd.isShowing()) {
+//            Log.i("Inside pd", "pd is running");
+//            pd.dismiss();
+//            pd = null;
+//        }
     }
 
     @Override
