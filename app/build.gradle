@@ -16,8 +16,8 @@ android {
         applicationId 'com.LiveEarthquakesAlerts'
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 9
-        versionName "9.0"
+        versionCode 11
+        versionName "11.0"
         // Enabling multidex support.
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

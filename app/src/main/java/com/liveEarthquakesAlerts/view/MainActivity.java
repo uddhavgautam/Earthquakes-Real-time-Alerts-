@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void onReceive(Context context, Intent intent) {
                 if (intent.getBooleanExtra("isInitializedAlready", false /* default value */) && intent.getBooleanExtra("LocationPermissionAlready", false)) { //it means already initialized
                     Log.i("Broadcast", " receiver executed!");
-                    startService(locInitServiceIntent);
+                    startService(locInitServiceIntent); //started service
                 }
             }
         };
