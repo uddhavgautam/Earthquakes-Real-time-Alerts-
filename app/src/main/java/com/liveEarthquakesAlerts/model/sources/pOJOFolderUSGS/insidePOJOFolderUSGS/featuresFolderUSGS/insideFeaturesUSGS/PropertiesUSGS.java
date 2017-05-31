@@ -54,6 +54,7 @@ public class PropertiesUSGS {
     public void setTime(String time) {
         this.time = time;
     }
+
     public int getSig() {
         return sig;
     }

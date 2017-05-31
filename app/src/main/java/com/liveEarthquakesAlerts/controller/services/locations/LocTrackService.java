@@ -233,7 +233,7 @@ public class LocTrackService extends Service
     public void onLocationChanged(Location location) { //main thread
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-         
+
             return;
         }
         if (LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient) != null) {

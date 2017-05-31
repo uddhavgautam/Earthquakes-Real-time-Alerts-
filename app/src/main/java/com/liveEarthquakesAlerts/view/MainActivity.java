@@ -79,23 +79,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         final ValueEventListener valueEventListenerEarthquake = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                try {
-                    if (OnLineTracker.isOnline(context)) {
-                        if (AppSettings.getInstance().getProximity() == 0) {
-                            Log.i("FirebaseDb", " World-wide");
-                            SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
-                            clientHelper.getDataFromUSGSCalledFromDataListener();
+                if (AppSettings.getInstance().getProximity() == 0) {
+                    Log.i("FirebaseDb", " World-wide");
+                    SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
+                    clientHelper.getDataFromUSGSCalledFromDataListener();
 
-                        } else { //user-proximity
-                            Log.i("FirebaseDb", " User-proximity");
-                            SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
-                            clientHelper.getPartialDataFromUSGSCalledFromDataListener();
-                        }
-                    } else {
-                        App.bus.post(new BusStatus(999));
-                    }
-                } catch (Exception e) {
-                    OnLineTracker.catchException(e);
+                } else { //user-proximity
+                    Log.i("FirebaseDb", " User-proximity");
+                    SaveResponseToDB clientHelper = new SaveResponseToDB(); //clears the database in constructor
+                    clientHelper.getPartialDataFromUSGSCalledFromDataListener();
                 }
             }
 

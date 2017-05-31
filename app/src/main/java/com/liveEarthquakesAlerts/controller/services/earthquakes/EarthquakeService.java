@@ -19,6 +19,8 @@ public class EarthquakeService extends Service {
 
     private static final String TAG = "EarthquakeService";
 
+    public static Thread insideThread;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -32,7 +34,7 @@ public class EarthquakeService extends Service {
             @Override
             public void run() {
                 while (true) {
-                    Thread insideThread = new Thread(new Runnable() {
+                    insideThread = new Thread(new Runnable() {
 
                         @Override
                         public void run() {
@@ -49,7 +51,7 @@ public class EarthquakeService extends Service {
                     });
                     insideThread.start();
                     try {
-                        Thread.sleep(11000);
+                        Thread.sleep(11000); //If I keep getting earthquakes Updates from Firebase, I keep sleeping this thread
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

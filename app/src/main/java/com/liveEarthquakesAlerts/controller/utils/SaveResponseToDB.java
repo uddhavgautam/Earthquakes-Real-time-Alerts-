@@ -1,13 +1,9 @@
 package com.liveEarthquakesAlerts.controller.utils;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -26,12 +22,6 @@ import com.liveEarthquakesAlerts.view.MainActivity;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -195,39 +185,41 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
 
         databaseReference.child("realTimeEarthquakes").setValue(items);
 
-        String jsonString = "{\"metaInfo\":{\"onlineLastTime\":1491873255092}}";
+//        String jsonString = "{\"metaInfo\":{\"onlineLastTime\":1491873255092}}";
+//
+//        Map<String, Object> jsonMap = new Gson().fromJson(jsonString, new TypeToken<HashMap<String, Object>>() {
+//        }.getType());
+//
+//        databaseReference.child("serverTrack").setValue(jsonMap);   /* upload jsonOriginal on new "serverTrack" node */
 
-        Map<String, Object> jsonMap = new Gson().fromJson(jsonString, new TypeToken<HashMap<String, Object>>() {
-        }.getType());
-
-        databaseReference.child("serverTrack").setValue(jsonMap);   /* upload jsonOriginal on new "serverTrack" node */
-
-        databaseReference.child("serverTrack").child("metaInfo").child("onlineLastTime").setValue(new Date().getTime()).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    SaveResponseToDB.isInitialized = true;
-                    App.bus.post(new BusStatus(1234)); //post event into the Otto bus // for broadcasting
-
-                    //update modifiedCheckTime
-                    SimpleDateFormat dateFormat2 = new SimpleDateFormat("E',' dd MMM yyyy kk:mm:ss 'GMT'"); //instead of hh, use kk for 24 hours format
-                    TimeZone timeZone2 = TimeZone.getTimeZone("GMT");
-                    dateFormat2.setTimeZone(timeZone2);
-                    Calendar cal1 = Calendar.getInstance(timeZone2);
-                    Date firebaseUpdatedTime = cal1.getTime();
-                    MainActivity.modifiedCheckTime = dateFormat2.format(firebaseUpdatedTime);
-                    Log.i("ModifiedTm ", MainActivity.modifiedCheckTime);
-
-                    DatabaseReference realTimeEarthquakes = FirebaseDatabase.getInstance().getReference().getRoot().child("realTimeEarthquakes");
-
-                    MainActivity.FirebaseSync(context, realTimeEarthquakes);
-                }
-            }
-        });
+//        databaseReference.child("serverTrack").child("metaInfo").child("onlineLastTime").setValue(new Date().getTime()).addOnCompleteListener(new OnCompleteListener<Void>()
+//        {
+//            @Override
+//            public void onComplete(@NonNull Task<Void> task) {
+//                if (task.isSuccessful()) {
+//                    SaveResponseToDB.isInitialized = true;
+//                    App.bus.post(new BusStatus(1234)); //post event into the Otto bus // for broadcasting
+//
+//                    //update modifiedCheckTime
+//                    SimpleDateFormat dateFormat2 = new SimpleDateFormat("E',' dd MMM yyyy kk:mm:ss 'GMT'"); //instead of hh, use kk for 24 hours format
+//                    TimeZone timeZone2 = TimeZone.getTimeZone("GMT");
+//                    dateFormat2.setTimeZone(timeZone2);
+//                    Calendar cal1 = Calendar.getInstance(timeZone2);
+//                    Date firebaseUpdatedTime = cal1.getTime();
+//                    MainActivity.modifiedCheckTime = dateFormat2.format(firebaseUpdatedTime);
+//                    Log.i("ModifiedTm ", MainActivity.modifiedCheckTime);
+//
+//                    DatabaseReference realTimeEarthquakes = FirebaseDatabase.getInstance().getReference().getRoot().child("realTimeEarthquakes");
+//
+//                    MainActivity.FirebaseSync(context, realTimeEarthquakes);
+//                }
+//            }
+//        });
     }
+
     public static String checkIfFirebaseHasData(String urlStr) { //download from Firebase
         String myStr = "";
-        Request request = new Request.Builder().url(urlStr).build(); //Request builder is used to get JSON url
+        Request request = new Request.Builder().url(urlStr).build(); //Request builder is to get JSON url
 
         try {
             Response response = new OkHttpClient().newCall(request).execute(); //OkHttpClient is HTTP client to request
@@ -302,6 +294,11 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
                 String url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/1.0_hour.geojson";
                 String json = getJson(url); //don't need to check http if-modified-since
 
+                try {
+                    Thread.sleep(11000); //increase threadsleep time further
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 if (json == null || json.length() < 1) { // JSON is null or empty , json.length() defines the length of string
                     return;
                 }
@@ -316,82 +313,42 @@ public class SaveResponseToDB { //this class updates EarthQuakes Bean
 
     }
 
-    public void getPartialDataFromUSGS() {
-        try {
-            Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat(OnLineTracker.DATEFORMAT).create();
-
-            Type listType = new TypeToken<POJOUSGS<MetadataUSGS, FeaturesUSGS<PropertiesUSGS, GeometryUSGS>>>() {
-            }.getType();
-
-            float currentLat = (float) LocationPOJO.location.getLatitude();
-            float currentLong = (float) LocationPOJO.location.getLongitude();
-            float minLatValue, minLongValue, maxLatValue, maxLongValue;
-            minLatValue = (float) (currentLat - 2.91);
-            maxLatValue = (float) (currentLat + 2.91);
-            minLongValue = (float) (currentLong - 2.89);
-            maxLongValue = (float) (currentLong + 2.91);
-
-            String url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=JSON&minlatitude=-" + minLatValue + "&minlongitude=-" + minLongValue + "&maxlatitude=-" + maxLatValue + "&maxlongitude=-" + maxLongValue;
-            String json = "";
-            if (USGSGotNewData(MainActivity.modifiedCheckTime)) {
-                json = getJson(url);
-            } else return;
-
-            if (json == null || json.length() < 1) { // JSON is null or empty , json.length() defines the length of string
-                return;
-            }
-
-            POJOUSGS<MetadataUSGS, FeaturesUSGS<PropertiesUSGS, GeometryUSGS>> items = gson.fromJson(json, listType);
-
-            if (items == null || items.getFeatures() == null || items.getFeatures().size() == 0) { //check if item null or items' features null or item's features empty
-                return;
-            }
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot();
-
-            updateFirebaseDatabase(items.getMetadata(), databaseReference); //update only metadata
-            updateLocalDatabases(items); //update USGS also. It means you are updating just metadata for notification
-
-        } catch (Exception e) {
-            OnLineTracker.catchException(e);
-        }
-    }
-
     public void getPartialDataFromUSGSCalledFromDataListener() {
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat(OnLineTracker.DATEFORMAT).create();
+
+        Type listType = new TypeToken<POJOUSGS<MetadataUSGS, FeaturesUSGS<PropertiesUSGS, GeometryUSGS>>>() {
+        }.getType();
+
+        float currentLat = (float) LocationPOJO.location.getLatitude();
+        float currentLong = (float) LocationPOJO.location.getLongitude();
+        float minLatValue, minLongValue, maxLatValue, maxLongValue;
+        minLatValue = (float) (currentLat - 2.91);
+        maxLatValue = (float) (currentLat + 2.91);
+        minLongValue = (float) (currentLong - 2.89);
+        maxLongValue = (float) (currentLong + 2.91);
+
+        String url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=JSON&minlatitude=-" + minLatValue + "&minlongitude=-" + minLongValue + "&maxlatitude=-" + maxLatValue + "&maxlongitude=-" + maxLongValue;
+        String json = "";
+
+        json = getJson(url);
         try {
-
-            Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat(OnLineTracker.DATEFORMAT).create();
-
-            Type listType = new TypeToken<POJOUSGS<MetadataUSGS, FeaturesUSGS<PropertiesUSGS, GeometryUSGS>>>() {
-            }.getType();
-
-            float currentLat = (float) LocationPOJO.location.getLatitude();
-            float currentLong = (float) LocationPOJO.location.getLongitude();
-            float minLatValue, minLongValue, maxLatValue, maxLongValue;
-            minLatValue = (float) (currentLat - 2.91);
-            maxLatValue = (float) (currentLat + 2.91);
-            minLongValue = (float) (currentLong - 2.89);
-            maxLongValue = (float) (currentLong + 2.91);
-
-            String url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=JSON&minlatitude=-" + minLatValue + "&minlongitude=-" + minLongValue + "&maxlatitude=-" + maxLatValue + "&maxlongitude=-" + maxLongValue;
-            String json = "";
-            if (USGSGotNewData(MainActivity.modifiedCheckTime)) {
-                json = getJson(url);
-            } else return;
-
-            if (json == null || json.length() < 1) { // JSON is null or empty , json.length() defines the length of string
-                return;
-            }
-            POJOUSGS<MetadataUSGS, FeaturesUSGS<PropertiesUSGS, GeometryUSGS>> items = gson.fromJson(json, listType);
-
-            if (items == null || items.getFeatures() == null || items.getFeatures().size() == 0) { //check if item null or items' features null or item's features empty
-                return;
-            }
-
-            updateLocalDatabases(items); //update USGS also. It means you are updating just metadata for notification
-
-        } catch (Exception e) {
-            OnLineTracker.catchException(e);
+            Thread.sleep(11000); //increase threadsleep time further
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+        if (json == null || json.length() < 1) { // JSON is null or empty , json.length() defines the length of string
+            return;
+        }
+        POJOUSGS<MetadataUSGS, FeaturesUSGS<PropertiesUSGS, GeometryUSGS>> items = gson.fromJson(json, listType);
+
+        if (items == null || items.getFeatures() == null || items.getFeatures().size() == 0) { //check if item null or items' features null or item's features empty
+            return;
+        }
+
+        updateLocalDatabases(items); //update USGS also. It means you are updating just metadata for notification
+
+
     }
 
 }

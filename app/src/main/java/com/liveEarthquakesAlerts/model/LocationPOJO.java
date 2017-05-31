@@ -1,6 +1,7 @@
 package com.liveEarthquakesAlerts.model;
 
 import android.location.Location;
+
 /**
  * Created by  Uddhav Gautam  on 3/22/17.
  */
